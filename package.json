@@ -32,10 +32,12 @@
         "format": "npm run format_inner -- --check .",
         "format_fix": "npm run format_inner -- --write .",
         "format_inner": "prettier",
+        "lint": "npm run tsc && npm run eslint && npm run format && npm run packagejson",
         "packagejson": "sort-package-json --check",
         "packagejson:fix": "sort-package-json",
         "publish": "vsce publish",
-        "validate": "npm run packagejson && npm run format && npm run eslint && npm run build",
+        "tsc": "tsc --noEmit --skipLibCheck && echo No TSC problems",
+        "validate": "npm run lint && npm run build",
         "vscode:prepublish": "npm run build"
     },
     "contributes": {
@@ -282,7 +284,10 @@
     ],
     "lint-staged": {
         "*": "prettier --check",
-        "src/**/*.ts": "npm run eslint_inner",
+        "src/**/*.ts": [
+            "npm run eslint_inner",
+            "npm run tsc"
+        ],
         "package.json": "npm run packagejson"
     },
     "dependencies": {
