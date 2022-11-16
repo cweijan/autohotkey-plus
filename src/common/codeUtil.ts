@@ -18,7 +18,7 @@ export class CodeUtil {
     }
 
     public static join(array: any[], items: any | any[]) {
-        if (array == undefined || items == undefined) {
+        if (!array || !items) {
             return;
         }
         if (Array.isArray(items)) {
@@ -37,7 +37,7 @@ export class CodeUtil {
 
         const regs = [];
         let temp: RegExpExecArray;
-        while ((temp = regex.exec(text)) != null) {
+        while ((temp = regex.exec(text))) {
             regs.push(temp);
         }
 

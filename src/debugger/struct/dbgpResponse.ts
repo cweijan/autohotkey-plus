@@ -4,6 +4,8 @@ export interface DbgpResponse {
         stack: any;
         command: string;
         context: string;
+        // AHK uses these variable names, let's keep them for now
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         transaction_id: string;
         success: '0' | '1';
         /** Breakpoint id */
