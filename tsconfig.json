@@ -4,20 +4,12 @@
         "target": "es2019",
         "outDir": "out",
         "experimentalDecorators": true,
-        "lib": [
-            "es6",
-            "es2017",
-            "es2019"
-        ],
+        "lib": ["es6", "es2017", "es2019"],
         "sourceMap": true,
         "paths": {
-            "@/*": [
-                "./src/*"
-            ]
+            "@/*": ["./src/*"]
         },
         "rootDir": "src"
     },
-    "exclude": [
-        "node_modules"
-    ]
+    "exclude": ["node_modules"]
 }
