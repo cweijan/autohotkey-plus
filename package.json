@@ -280,6 +280,7 @@
         "onDebug"
     ],
     "lint-staged": {
+        "*": "prettier --check",
         "package.json": "npm run packagejson"
     },
     "dependencies": {
