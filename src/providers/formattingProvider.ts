@@ -71,7 +71,7 @@ export class FormatProvider implements vscode.DocumentFormattingEditProvider {
             }
 
             if (purityText.match(/\b(return|ExitApp)\b/i) && tagDeep === deep) {
-                tagDeep == 0;
+                tagDeep === 0;
                 deep--;
                 notDeep = false;
             }
@@ -87,7 +87,7 @@ export class FormatProvider implements vscode.DocumentFormattingEditProvider {
                 }
             }
 
-            if (purityText.match(/}/) != null) {
+            if (purityText.match(/}/)) {
                 let temp = purityText.match(/}/).length;
                 const t2 = purityText.match(/{[^{}]*}/);
                 if (t2) {
@@ -99,7 +99,7 @@ export class FormatProvider implements vscode.DocumentFormattingEditProvider {
                 }
             }
 
-            if (oneCommandCode && purityText.match(/{/) != null) {
+            if (oneCommandCode && purityText.match(/{/)) {
                 let temp = purityText.match(/{/).length;
                 const t2 = purityText.match(/{[^{}]*}/);
                 if (t2) {
@@ -123,7 +123,7 @@ export class FormatProvider implements vscode.DocumentFormattingEditProvider {
                     .replace(/;.+/, '')
                     .replace(/ {2,}/g, ' ') + comment;
             formatDocument +=
-                !formatedText || formatedText.trim() == ''
+                !formatedText || formatedText.trim() === ''
                     ? formatedText
                     : ' '.repeat(deep * options.tabSize) + formatedText;
             if (line !== document.lineCount - 1) {
@@ -143,7 +143,7 @@ export class FormatProvider implements vscode.DocumentFormattingEditProvider {
                 notDeep = false;
             }
 
-            if (purityText.match(/{/) != null) {
+            if (purityText.match(/{/)) {
                 let temp = purityText.match(/{/).length;
                 const t2 = purityText.match(/{[^{}]*}/);
                 if (t2) {
@@ -167,7 +167,7 @@ export class FormatProvider implements vscode.DocumentFormattingEditProvider {
                     if (
                         (temp = new RegExp('\\b' + oneCommand + '\\b(.*)').exec(
                             purityText,
-                        )) != null &&
+                        )) &&
                         !temp[1].includes('/')
                     ) {
                         oneCommandCode = true;

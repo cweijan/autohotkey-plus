@@ -1,7 +1,6 @@
 import { commands } from 'vscode';
 import {
     BreakpointEvent,
-    ExitedEvent,
     InitializedEvent,
     LoggingDebugSession,
     OutputEvent,
@@ -27,7 +26,10 @@ export interface LaunchRequestArguments
     /** An absolute path to the AutoHotkey.exe. */
     runtime: string;
     dbgpSettings: {
+        // AHK uses these variable names, let's keep them for now
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         max_children?: number;
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         max_data?: number;
     };
 }
@@ -36,7 +38,7 @@ export interface LaunchRequestArguments
  * debug session for vscode.
  */
 export class DebugSession extends LoggingDebugSession {
-    private static THREAD_ID = 1;
+    private static threadId = 1;
     private dispather: DebugDispather;
 
     public constructor() {
@@ -49,9 +51,7 @@ export class DebugSession extends LoggingDebugSession {
         this.dispather = new DebugDispather();
         this.dispather
             .on('break', (reason: string) => {
-                this.sendEvent(
-                    new StoppedEvent(reason, DebugSession.THREAD_ID),
-                );
+                this.sendEvent(new StoppedEvent(reason, DebugSession.threadId));
             })
             .on('breakpointValidated', (bp: DebugProtocol.Breakpoint) => {
                 this.sendEvent(
@@ -187,7 +187,7 @@ export class DebugSession extends LoggingDebugSession {
         args: DebugProtocol.PauseArguments,
         request?: DebugProtocol.Request,
     ): void {
-        this.dispather.sendComand(Continue.BREAK);
+        this.dispather.sendComand(Continue.break);
         this.sendResponse(response);
     }
 
@@ -195,7 +195,7 @@ export class DebugSession extends LoggingDebugSession {
         response: DebugProtocol.ContinueResponse,
         args: DebugProtocol.ContinueArguments,
     ): void {
-        this.dispather.sendComand(Continue.RUN);
+        this.dispather.sendComand(Continue.run);
         this.sendResponse(response);
     }
 
@@ -203,7 +203,7 @@ export class DebugSession extends LoggingDebugSession {
         response: DebugProtocol.NextResponse,
         args: DebugProtocol.NextArguments,
     ): void {
-        this.dispather.sendComand(Continue.STEP_OVER);
+        this.dispather.sendComand(Continue.stepOver);
         this.sendResponse(response);
     }
 
@@ -212,7 +212,7 @@ export class DebugSession extends LoggingDebugSession {
         args: DebugProtocol.StepInArguments,
         request?: DebugProtocol.Request,
     ): void {
-        this.dispather.sendComand(Continue.STEP_INTO);
+        this.dispather.sendComand(Continue.stepInto);
         this.sendResponse(response);
     }
 
@@ -221,13 +221,13 @@ export class DebugSession extends LoggingDebugSession {
         args: DebugProtocol.StepOutArguments,
         request?: DebugProtocol.Request,
     ): void {
-        this.dispather.sendComand(Continue.STEP_OUT);
+        this.dispather.sendComand(Continue.stepOut);
         this.sendResponse(response);
     }
 
     protected threadsRequest(response: DebugProtocol.ThreadsResponse): void {
         response.body = {
-            threads: [new Thread(DebugSession.THREAD_ID, 'main thread')],
+            threads: [new Thread(DebugSession.threadId, 'main thread')],
         };
         this.sendResponse(response);
     }
@@ -239,10 +239,10 @@ export class DebugSession extends LoggingDebugSession {
         response.body = {
             targets: [
                 ...(await this.dispather.listVariables({
-                    variablesReference: VscodeScope.LOCAL,
+                    variablesReference: VscodeScope.local,
                 })),
                 ...(await this.dispather.listVariables({
-                    variablesReference: VscodeScope.GLOBAL,
+                    variablesReference: VscodeScope.global,
                 })),
             ].map((variable) => {
                 return {
@@ -261,13 +261,13 @@ export class DebugSession extends LoggingDebugSession {
     ): Promise<void> {
         const exp = args.expression.split('=');
         let reply: string;
-        if (exp.length == 1) {
+        if (exp.length === 1) {
             reply = await this.dispather.getVariableByEval(args.expression);
         } else {
             this.dispather.setVariable({
                 name: exp[0],
                 value: exp[1],
-                variablesReference: VscodeScope.LOCAL,
+                variablesReference: VscodeScope.local,
             });
             reply = `execute: ${args.expression}`;
         }

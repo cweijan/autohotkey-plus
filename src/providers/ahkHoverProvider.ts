@@ -57,7 +57,7 @@ export class AhkHoverProvider implements HoverProvider {
 
     private tryGetSnippetHover(context: Context): Hover {
         let snippetKey = context.word.toLowerCase();
-        if (context.nextChart == '(') {
+        if (context.nextChart === '(') {
             snippetKey += '()';
         }
         const snippet = this.snippetCache.get(snippetKey);
@@ -86,7 +86,7 @@ export class AhkHoverProvider implements HoverProvider {
                     wordRange.start.character,
                 ),
             );
-            if (preChart == '#') {
+            if (preChart === '#') {
                 word = '#' + word;
             }
         }

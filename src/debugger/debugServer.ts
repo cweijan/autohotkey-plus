@@ -25,7 +25,7 @@ export class DebugServer extends EventEmitter {
                     tempData = tempData
                         ? Buffer.concat([tempData, chunk])
                         : chunk;
-                    if (tempData[tempData.length - 1] == END) {
+                    if (tempData[tempData.length - 1] === END) {
                         this.process(tempData.toString());
                         tempData = null;
                     }
@@ -79,11 +79,11 @@ export class DebugServer extends EventEmitter {
     });
     public process(data: string) {
         data = data.substr(data.indexOf('<?xml'));
-        if (data.indexOf(this.header) == -1) {
+        if (!data.includes(this.header)) {
             data = this.header + data;
         }
         for (const part of data.split(this.header)) {
-            if (null == part || part.trim() == '') {
+            if (!part?.trim()) {
                 continue;
             }
             const xmlString = this.header + part;
