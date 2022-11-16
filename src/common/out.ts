@@ -2,7 +2,9 @@ import format from 'date-format';
 import * as vscode from 'vscode';
 
 function formatDate(date: Date) {
-    if (!date) return '';
+    if (!date) {
+        return '';
+    }
     return format('yyyy-MM-dd hh:mm:ss', date);
 }
 

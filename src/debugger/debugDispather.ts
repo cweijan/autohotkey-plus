@@ -64,7 +64,9 @@ export class DebugDispather extends EventEmitter {
         args: LaunchRequestArguments,
         dbgpSettings: { max_children?: number; max_data?: number } = {},
     ) {
-        if (this.port) return;
+        if (this.port) {
+            return;
+        }
         const { max_children = 300, max_data = 131072 } = dbgpSettings;
         this.breakPointHandler = new BreakPointHandler();
         this.stackHandler = new StackHandler();
