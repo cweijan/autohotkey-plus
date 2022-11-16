@@ -1,313 +1,313 @@
 {
-	"name": "vscode-autohotkey-plus",
-	"displayName": "AutoHotkey Plus",
-	"version": "2.7.1",
-	"description": "AutoHotkey language support for VS Code",
-	"categories": [
-		"Programming Languages",
-		"Snippets"
-	],
-	"keywords": [
-		"vscode",
-		"autohotkey",
-		"ahk"
-	],
-	"homepage": "https://github.com/vscode-autohotkey/autohotkey-plus/blob/master/README.md",
-	"bugs": {
-		"url": "https://github.com/vscode-autohotkey/autohotkey-plus/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/vscode-autohotkey/autohotkey-plus.git"
-	},
-	"license": "LICENSE",
-	"publisher": "cweijan",
-	"main": "./out/extension",
-	"scripts": {
-		"build": "rimraf out && node build.js --mode=production",
-		"dev": "rimraf out && node build.js",
-		"format": "npm run format_inner -- --check .",
-		"format_fix": "npm run format_inner -- --write .",
-		"format_inner": "prettier",
-		"lint": "eslint src/**/*.ts",
-		"lint:fix": "eslint src/**/*.ts --fix",
-		"packagejson": "sort-package-json --check",
-		"packagejson:fix": "sort-package-json",
-		"publish": "vsce publish",
-		"validate": "npm run packagejson && npm run build",
-		"vscode:prepublish": "npm run build"
-	},
-	"contributes": {
-		"breakpoints": [
-			{
-				"language": "ahk"
-			}
-		],
-		"commands": [
-			{
-				"command": "document.open",
-				"title": "Open AutoHotkey Document",
-				"category": "AHK"
-			},
-			{
-				"command": "compile.ahk",
-				"title": "Compile Script",
-				"category": "AHK",
-				"icon": "./image/build.svg"
-			},
-			{
-				"command": "run.ahk",
-				"title": "Run Script",
-				"category": "AHK"
-			},
-			{
-				"command": "run.selection.ahk",
-				"title": "Run Selection Script",
-				"category": "AHK"
-			},
-			{
-				"command": "debug.ahk",
-				"title": "Debug Script",
-				"category": "AHK",
-				"icon": "$(debug-alt)"
-			}
-		],
-		"configuration": {
-			"type": "object",
-			"title": "Ahk Plus",
-			"properties": {
-				"vscode-ahk-plus.executePath": {
-					"type": "string",
-					"default": "C:/Program Files/AutoHotkey/AutoHotkeyU64.exe",
-					"description": "Execute path of autohotkey."
-				},
-				"vscode-ahk-plus.compilePath": {
-					"type": "string",
-					"default": "C:/Program Files/AutoHotkey/Compiler/Ahk2Exe.exe",
-					"description": "Compiler path of autohotkey."
-				},
-				"vscode-ahk-plus.compileIcon": {
-					"type": "string",
-					"default": "",
-					"description": "Icon path for the compiled file."
-				},
-				"vscode-ahk-plus.compileBaseFile": {
-					"type": "string",
-					"default": "",
-					"description": "Base File (.bin) path for compiling (optional)."
-				},
-				"vscode-ahk-plus.compileMpress": {
-					"type": "boolean",
-					"default": false,
-					"description": "Use MPRESS (if present) to compress resulting exe."
-				},
-				"vscode-ahk-plus.documentPath": {
-					"type": "string",
-					"default": "C:/Program Files/AutoHotkey/AutoHotkey.chm",
-					"description": "Document path of autohotkey."
-				},
-				"vscode-ahk-plus.enableIntelliSense": {
-					"type": "boolean",
-					"default": true,
-					"description": "EnableIntelliSense(Preview)."
-				}
-			}
-		},
-		"debuggers": [
-			{
-				"type": "ahk",
-				"label": "AutoHotkey",
-				"program": "./out/debugger/DebugAdapter.js",
-				"runtime": "\"C:\\Program Files\\AutoHotkey\\AutoHotkeyU64.exe\"",
-				"configurationAttributes": {
-					"launch": {
-						"required": [
-							"program"
-						],
-						"properties": {
-							"program": {
-								"type": "string",
-								"description": "Absolute path to a text file.",
-								"default": "${file}"
-							},
-							"runtime": {
-								"type": "string",
-								"description": "Absolute path to a AutoHotkey.exe file.",
-								"default": "C:\\Program Files\\AutoHotkey\\AutoHotkeyU64.exe"
-							},
-							"stopOnEntry": {
-								"type": "boolean",
-								"description": "Automatically stop after launch.",
-								"default": true
-							},
-							"trace": {
-								"type": "boolean",
-								"description": "Enable logging of the Debug Adapter Protocol.",
-								"default": true
-							},
-							"dbgpSettings": {
-								"type": "object",
-								"properties": {
-									"max_children": {
-										"type": "integer",
-										"description": "max number of array or object children to initially retrieve",
-										"default": 300
-									},
-									"max_data": {
-										"type": "integer",
-										"description": "max amount of variable data to initially retrieve.",
-										"default": 131072
-									}
-								},
-								"description": "Dbgp settings. See https://xdebug.org/docs-dbgp.php#feature-names",
-								"default": {}
-							}
-						}
-					}
-				},
-				"initialConfigurations": [
-					{
-						"type": "ahk",
-						"request": "launch",
-						"name": "AutoHotkey Debugger",
-						"program": "${file}",
-						"stopOnEntry": true
-					}
-				],
-				"configurationSnippets": [
-					{
-						"label": "AutoHotkey Debug: Launch",
-						"body": {
-							"type": "ahk",
-							"request": "launch",
-							"name": "AutoHotkey Debugger",
-							"program": "${file}",
-							"stopOnEntry": true
-						}
-					}
-				]
-			}
-		],
-		"grammars": [
-			{
-				"language": "ahk",
-				"scopeName": "source.ahk",
-				"path": "./language/ahk.tmLanguage.json"
-			}
-		],
-		"keybindings": [
-			{
-				"command": "document.open",
-				"key": "f1",
-				"when": "editorLangId == ahk"
-			},
-			{
-				"command": "debug.ahk",
-				"key": "f9",
-				"when": "editorLangId == ahk"
-			},
-			{
-				"command": "run.selection.ahk",
-				"key": "f8",
-				"when": "editorLangId == ahk"
-			},
-			{
-				"command": "run.ahk",
-				"key": "ctrl+f9",
-				"when": "editorLangId == ahk"
-			},
-			{
-				"command": "compile.ahk",
-				"key": "ctrl+shift+f9",
-				"when": "editorLangId == ahk"
-			}
-		],
-		"languages": [
-			{
-				"id": "ahk",
-				"aliases": [
-					"AutoHotkey",
-					"autohotkey",
-					"ahk"
-				],
-				"extensions": [
-					".ahk",
-					".ext"
-				],
-				"configuration": "./language/ahk.configuration.json",
-				"icon": {
-					"dark": "./language/autohotkey.svg",
-					"light": "./language/autohotkey.svg"
-				}
-			}
-		],
-		"menus": {
-			"editor/context": [
-				{
-					"command": "run.selection.ahk",
-					"when": "editorLangId == ahk && editorHasSelection",
-					"group": "navigation@-1"
-				},
-				{
-					"command": "run.ahk",
-					"when": "editorLangId == ahk",
-					"group": "navigation@0"
-				},
-				{
-					"command": "compile.ahk",
-					"when": "editorLangId == ahk",
-					"group": "navigation@1"
-				}
-			],
-			"editor/title": [
-				{
-					"command": "debug.ahk",
-					"when": "editorLangId == ahk",
-					"group": "navigation@1"
-				}
-			]
-		},
-		"snippets": [
-			{
-				"language": "ahk",
-				"path": "./language/snippets.json"
-			}
-		]
-	},
-	"activationEvents": [
-		"onLanguage:ahk",
-		"onCommand:run.ahk",
-		"onDebug"
-	],
-	"lint-staged": {
-		"package.json": "npm run packagejson"
-	},
-	"dependencies": {
-		"@vscode/debugadapter": "^1.57.0",
-		"date-format": "^4.0.13",
-		"portfinder": "^1.0.32",
-		"xml2js": "^0.4.23"
-	},
-	"devDependencies": {
-		"@types/node": "^17.0.23",
-		"@types/vscode": "^1.50.0",
-		"@typescript-eslint/eslint-plugin": "^5.37.0",
-		"@typescript-eslint/parser": "^5.37.0",
-		"esbuild": "^0.15.7",
-		"esbuild-plugin-eslint": "^0.1.1",
-		"eslint": "^8.23.1",
-		"husky": "^8.0.1",
-		"lint-staged": "^13.0.3",
-		"rimraf": "^3.0.2",
-		"sort-package-json": "^1.57.0",
-		"typescript": "^4.6.3"
-	},
-	"engines": {
-		"vscode": "^1.50.0"
-	},
-	"icon": "icon.png",
-	"galleryBanner": {
-		"color": "#5c2d91",
-		"theme": "dark"
-	}
+    "name": "vscode-autohotkey-plus",
+    "displayName": "AutoHotkey Plus",
+    "version": "2.7.1",
+    "description": "AutoHotkey language support for VS Code",
+    "categories": [
+        "Programming Languages",
+        "Snippets"
+    ],
+    "keywords": [
+        "vscode",
+        "autohotkey",
+        "ahk"
+    ],
+    "homepage": "https://github.com/vscode-autohotkey/autohotkey-plus/blob/master/README.md",
+    "bugs": {
+        "url": "https://github.com/vscode-autohotkey/autohotkey-plus/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/vscode-autohotkey/autohotkey-plus.git"
+    },
+    "license": "LICENSE",
+    "publisher": "cweijan",
+    "main": "./out/extension",
+    "scripts": {
+        "build": "rimraf out && node build.js --mode=production",
+        "dev": "rimraf out && node build.js",
+        "format": "npm run format_inner -- --check .",
+        "format_fix": "npm run format_inner -- --write .",
+        "format_inner": "prettier",
+        "lint": "eslint src/**/*.ts",
+        "lint:fix": "eslint src/**/*.ts --fix",
+        "packagejson": "sort-package-json --check",
+        "packagejson:fix": "sort-package-json",
+        "publish": "vsce publish",
+        "validate": "npm run packagejson && npm run build",
+        "vscode:prepublish": "npm run build"
+    },
+    "contributes": {
+        "breakpoints": [
+            {
+                "language": "ahk"
+            }
+        ],
+        "commands": [
+            {
+                "command": "document.open",
+                "title": "Open AutoHotkey Document",
+                "category": "AHK"
+            },
+            {
+                "command": "compile.ahk",
+                "title": "Compile Script",
+                "category": "AHK",
+                "icon": "./image/build.svg"
+            },
+            {
+                "command": "run.ahk",
+                "title": "Run Script",
+                "category": "AHK"
+            },
+            {
+                "command": "run.selection.ahk",
+                "title": "Run Selection Script",
+                "category": "AHK"
+            },
+            {
+                "command": "debug.ahk",
+                "title": "Debug Script",
+                "category": "AHK",
+                "icon": "$(debug-alt)"
+            }
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "Ahk Plus",
+            "properties": {
+                "vscode-ahk-plus.executePath": {
+                    "type": "string",
+                    "default": "C:/Program Files/AutoHotkey/AutoHotkeyU64.exe",
+                    "description": "Execute path of autohotkey."
+                },
+                "vscode-ahk-plus.compilePath": {
+                    "type": "string",
+                    "default": "C:/Program Files/AutoHotkey/Compiler/Ahk2Exe.exe",
+                    "description": "Compiler path of autohotkey."
+                },
+                "vscode-ahk-plus.compileIcon": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Icon path for the compiled file."
+                },
+                "vscode-ahk-plus.compileBaseFile": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Base File (.bin) path for compiling (optional)."
+                },
+                "vscode-ahk-plus.compileMpress": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Use MPRESS (if present) to compress resulting exe."
+                },
+                "vscode-ahk-plus.documentPath": {
+                    "type": "string",
+                    "default": "C:/Program Files/AutoHotkey/AutoHotkey.chm",
+                    "description": "Document path of autohotkey."
+                },
+                "vscode-ahk-plus.enableIntelliSense": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "EnableIntelliSense(Preview)."
+                }
+            }
+        },
+        "debuggers": [
+            {
+                "type": "ahk",
+                "label": "AutoHotkey",
+                "program": "./out/debugger/DebugAdapter.js",
+                "runtime": "\"C:\\Program Files\\AutoHotkey\\AutoHotkeyU64.exe\"",
+                "configurationAttributes": {
+                    "launch": {
+                        "required": [
+                            "program"
+                        ],
+                        "properties": {
+                            "program": {
+                                "type": "string",
+                                "description": "Absolute path to a text file.",
+                                "default": "${file}"
+                            },
+                            "runtime": {
+                                "type": "string",
+                                "description": "Absolute path to a AutoHotkey.exe file.",
+                                "default": "C:\\Program Files\\AutoHotkey\\AutoHotkeyU64.exe"
+                            },
+                            "stopOnEntry": {
+                                "type": "boolean",
+                                "description": "Automatically stop after launch.",
+                                "default": true
+                            },
+                            "trace": {
+                                "type": "boolean",
+                                "description": "Enable logging of the Debug Adapter Protocol.",
+                                "default": true
+                            },
+                            "dbgpSettings": {
+                                "type": "object",
+                                "properties": {
+                                    "max_children": {
+                                        "type": "integer",
+                                        "description": "max number of array or object children to initially retrieve",
+                                        "default": 300
+                                    },
+                                    "max_data": {
+                                        "type": "integer",
+                                        "description": "max amount of variable data to initially retrieve.",
+                                        "default": 131072
+                                    }
+                                },
+                                "description": "Dbgp settings. See https://xdebug.org/docs-dbgp.php#feature-names",
+                                "default": {}
+                            }
+                        }
+                    }
+                },
+                "initialConfigurations": [
+                    {
+                        "type": "ahk",
+                        "request": "launch",
+                        "name": "AutoHotkey Debugger",
+                        "program": "${file}",
+                        "stopOnEntry": true
+                    }
+                ],
+                "configurationSnippets": [
+                    {
+                        "label": "AutoHotkey Debug: Launch",
+                        "body": {
+                            "type": "ahk",
+                            "request": "launch",
+                            "name": "AutoHotkey Debugger",
+                            "program": "${file}",
+                            "stopOnEntry": true
+                        }
+                    }
+                ]
+            }
+        ],
+        "grammars": [
+            {
+                "language": "ahk",
+                "scopeName": "source.ahk",
+                "path": "./language/ahk.tmLanguage.json"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "document.open",
+                "key": "f1",
+                "when": "editorLangId == ahk"
+            },
+            {
+                "command": "debug.ahk",
+                "key": "f9",
+                "when": "editorLangId == ahk"
+            },
+            {
+                "command": "run.selection.ahk",
+                "key": "f8",
+                "when": "editorLangId == ahk"
+            },
+            {
+                "command": "run.ahk",
+                "key": "ctrl+f9",
+                "when": "editorLangId == ahk"
+            },
+            {
+                "command": "compile.ahk",
+                "key": "ctrl+shift+f9",
+                "when": "editorLangId == ahk"
+            }
+        ],
+        "languages": [
+            {
+                "id": "ahk",
+                "aliases": [
+                    "AutoHotkey",
+                    "autohotkey",
+                    "ahk"
+                ],
+                "extensions": [
+                    ".ahk",
+                    ".ext"
+                ],
+                "configuration": "./language/ahk.configuration.json",
+                "icon": {
+                    "dark": "./language/autohotkey.svg",
+                    "light": "./language/autohotkey.svg"
+                }
+            }
+        ],
+        "menus": {
+            "editor/context": [
+                {
+                    "command": "run.selection.ahk",
+                    "when": "editorLangId == ahk && editorHasSelection",
+                    "group": "navigation@-1"
+                },
+                {
+                    "command": "run.ahk",
+                    "when": "editorLangId == ahk",
+                    "group": "navigation@0"
+                },
+                {
+                    "command": "compile.ahk",
+                    "when": "editorLangId == ahk",
+                    "group": "navigation@1"
+                }
+            ],
+            "editor/title": [
+                {
+                    "command": "debug.ahk",
+                    "when": "editorLangId == ahk",
+                    "group": "navigation@1"
+                }
+            ]
+        },
+        "snippets": [
+            {
+                "language": "ahk",
+                "path": "./language/snippets.json"
+            }
+        ]
+    },
+    "activationEvents": [
+        "onLanguage:ahk",
+        "onCommand:run.ahk",
+        "onDebug"
+    ],
+    "lint-staged": {
+        "package.json": "npm run packagejson"
+    },
+    "dependencies": {
+        "@vscode/debugadapter": "^1.57.0",
+        "date-format": "^4.0.13",
+        "portfinder": "^1.0.32",
+        "xml2js": "^0.4.23"
+    },
+    "devDependencies": {
+        "@types/node": "^17.0.23",
+        "@types/vscode": "^1.50.0",
+        "@typescript-eslint/eslint-plugin": "^5.37.0",
+        "@typescript-eslint/parser": "^5.37.0",
+        "esbuild": "^0.15.7",
+        "esbuild-plugin-eslint": "^0.1.1",
+        "eslint": "^8.23.1",
+        "husky": "^8.0.1",
+        "lint-staged": "^13.0.3",
+        "rimraf": "^3.0.2",
+        "sort-package-json": "^1.57.0",
+        "typescript": "^4.6.3"
+    },
+    "engines": {
+        "vscode": "^1.50.0"
+    },
+    "icon": "icon.png",
+    "galleryBanner": {
+        "color": "#5c2d91",
+        "theme": "dark"
+    }
 }

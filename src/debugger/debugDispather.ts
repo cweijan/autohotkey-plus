@@ -10,7 +10,7 @@ import { StackHandler } from './handler/StackHandler';
 import { VariableHandler } from './handler/variableHandler';
 import { DbgpResponse } from './struct/dbgpResponse';
 import { VarScope } from './struct/scope';
-import * as portfinder from 'portfinder'
+import * as portfinder from 'portfinder';
 import { spawn } from 'child_process';
 import { resolve } from 'path';
 import { existsSync } from 'fs';
@@ -22,254 +22,327 @@ import { Global, ConfigKey } from '../common/global';
  * refrence: https://xdebug.org/docs/dbgp
  */
 export class DebugDispather extends EventEmitter {
+    private port: number;
+    private debugServer: DebugServer;
+    private breakPointHandler: BreakPointHandler;
+    private commandHandler: CommandHandler;
+    private stackHandler: StackHandler;
+    private variableHandler: VariableHandler;
+    private startArgs: LaunchRequestArguments;
 
-	private port: number;
-	private debugServer: DebugServer;
-	private breakPointHandler: BreakPointHandler;
-	private commandHandler: CommandHandler;
-	private stackHandler: StackHandler;
-	private variableHandler: VariableHandler;
-	private startArgs: LaunchRequestArguments;
+    /**
+     * Start executing the given program.
+     */
+    public async start(args: LaunchRequestArguments) {
+        await this.initDebugger(args, args.dbgpSettings);
 
-	/**
-	 * Start executing the given program.
-	 */
-	public async start(args: LaunchRequestArguments) {
+        const runtime = args.runtime ?? Global.getConfig(ConfigKey.executePath);
+        if (!args.program) {
+            args.program = await RunnerService.getPathByActive();
+        }
+        if (!existsSync(runtime)) {
+            Out.log(`Autohotkey Execute Bin Not Found : ${runtime}`);
+            this.end();
+            return;
+        }
+        const ahkArgs = [
+            '/ErrorStdOut',
+            `/debug=localhost:${this.port}`,
+            args.program,
+        ];
+        const ahkProcess = spawn(runtime, ahkArgs, {
+            cwd: `${resolve(args.program, '..')}`,
+        });
+        this.emit('output', `${runtime} ${ahkArgs.join(' ')}`);
+        ahkProcess.stderr.on('data', (err) => {
+            this.emit('output', err.toString('utf8'));
+            this.end();
+        });
+    }
 
-		await this.initDebugger(args, args.dbgpSettings);
+    private async initDebugger(
+        args: LaunchRequestArguments,
+        dbgpSettings: { max_children?: number; max_data?: number } = {},
+    ) {
+        if (this.port) return;
+        const { max_children = 300, max_data = 131072 } = dbgpSettings;
+        this.breakPointHandler = new BreakPointHandler();
+        this.stackHandler = new StackHandler();
+        this.variableHandler = new VariableHandler();
+        this.startArgs = args;
+        const port = await portfinder.getPortPromise({
+            port: 9000,
+            stopPort: 9100,
+        });
+        Out.debug(`Creating debug server, port is ${port}`);
+        this.debugServer = new DebugServer(port);
+        this.commandHandler = new CommandHandler(this.debugServer);
+        this.debugServer
+            .start()
+            .on('init', () => {
+                this.breakPointHandler.loopPoints((bp) => {
+                    this.setBreakPonit(bp);
+                });
+                this.sendComand(
+                    `feature_set -n max_children -v ${max_children}`,
+                );
+                this.sendComand(`feature_set -n max_data -v ${max_data}`);
+                this.sendComand(`feature_set -n max_depth -v 2`); // Get properties recursively. Therefore fixed at 2
+                this.sendComand('stdout -c 1');
+                this.sendComand('stderr -c 1');
+                this.sendComand('run');
+            })
+            .on('stream', (stream) => {
+                this.emit(
+                    'output',
+                    Buffer.from(stream.content, 'base64').toString(),
+                );
+            })
+            .on('response', (response: DbgpResponse) => {
+                if (response.attr.command) {
+                    this.commandHandler.callback(
+                        response.attr.transaction_id,
+                        response,
+                    );
+                    switch (response.attr.command) {
+                        case 'run':
+                        case 'step_into':
+                        case 'step_over':
+                        case 'step_out':
+                            this.processRunResponse(response);
+                            break;
+                        case 'stop':
+                            this.end();
+                            break;
+                    }
+                }
+            });
+        this.port = port;
+        return port;
+    }
 
-		const runtime = args.runtime ?? Global.getConfig(ConfigKey.executePath);
-		if (!args.program) {
-			args.program = await RunnerService.getPathByActive()
-		}
-		if (!existsSync(runtime)) {
-			Out.log(`Autohotkey Execute Bin Not Found : ${runtime}`)
-			this.end();
-			return;
-		}
-		const ahkArgs = ["/ErrorStdOut", `/debug=localhost:${this.port}`, args.program];
-		const ahkProcess = spawn(runtime, ahkArgs, { cwd: `${resolve(args.program, '..')}` })
-		this.emit('output', `${runtime} ${ahkArgs.join(" ")}`)
-		ahkProcess.stderr.on("data", err => {
-			this.emit('output', err.toString("utf8"))
-			this.end()
-		})
-	}
+    /**
+     * send command to the ahk debug proxy.
+     * @param command
+     */
+    public sendComand(command: string, data?: string): Promise<DbgpResponse> {
+        if (this.commandHandler) {
+            return this.commandHandler.sendComand(command, data);
+        }
+        return null;
+    }
 
-	private async initDebugger(args: LaunchRequestArguments, dbgpSettings: { max_children?: number; max_data?: number; } = {}) {
-		if (this.port) return;
-		const { max_children = 300, max_data = 131072 } = dbgpSettings;
-		this.breakPointHandler = new BreakPointHandler();
-		this.stackHandler = new StackHandler();
-		this.variableHandler = new VariableHandler();
-		this.startArgs = args;
-		const port = await portfinder.getPortPromise({ port: 9000, stopPort: 9100 });
-		Out.debug(`Creating debug server, port is ${port}`);
-		this.debugServer = new DebugServer(port);
-		this.commandHandler = new CommandHandler(this.debugServer);
-		this.debugServer.start()
-			.on("init", () => {
-				this.breakPointHandler.loopPoints((bp) => { this.setBreakPonit(bp); });
-				this.sendComand(`feature_set -n max_children -v ${max_children}`);
-				this.sendComand(`feature_set -n max_data -v ${max_data}`);
-				this.sendComand(`feature_set -n max_depth -v 2`); // Get properties recursively. Therefore fixed at 2
-				this.sendComand('stdout -c 1');
-				this.sendComand('stderr -c 1');
-				this.sendComand('run');
-			})
-			.on("stream", (stream) => {
-				this.emit('output', Buffer.from(stream.content, 'base64').toString());
-			})
-			.on("response", (response: DbgpResponse) => {
-				if (response.attr.command) {
-					this.commandHandler.callback(response.attr.transaction_id, response);
-					switch (response.attr.command) {
-						case 'run':
-						case 'step_into':
-						case 'step_over':
-						case 'step_out':
-							this.processRunResponse(response);
-							break;
-						case 'stop':
-							this.end();
-							break;
-					}
-				}
-			});
-		this.port = port;
-		return port;
-	}
+    public async restart() {
+        this.sendComand('stop');
+        this.debugServer.prepareNewConnection();
+        this.start(this.startArgs);
+    }
 
-	/**
-	 * send command to the ahk debug proxy.
-	 * @param command
-	 */
-	public sendComand(command: string, data?: string): Promise<DbgpResponse> {
-		if (this.commandHandler) {
-			return this.commandHandler.sendComand(command, data)
-		}
-		return null;
-	}
+    /**
+     * receive stop request from vscode, send command to notice the script stop.
+     */
+    public stop() {
+        this.sendComand('stop');
+        this.debugServer.shutdown();
+        this.emit('output', `The debugger has stopped.`);
+    }
 
-	public async restart() {
-		this.sendComand('stop');
-		this.debugServer.prepareNewConnection()
-		this.start(this.startArgs)
-	}
+    /**
+     * receive end message from script, send event to stop the debug session.
+     */
+    public end() {
+        if (!this.debugServer.hasNew) {
+            this.emit('end');
+        }
+        this.debugServer.shutdown();
+    }
 
-	/**
-	 * receive stop request from vscode, send command to notice the script stop.
-	 */
-	public stop() {
-		this.sendComand('stop');
-		this.debugServer.shutdown()
-		this.emit('output', `The debugger has stopped.`)
-	}
+    public scopes(frameId: number): Scope[] {
+        return this.variableHandler.scopes(frameId);
+    }
 
-	/**
-	 * receive end message from script, send event to stop the debug session.
-	 */
-	public end() {
-		if (!this.debugServer.hasNew) {
-			this.emit('end');
-		}
-		this.debugServer.shutdown()
-	}
+    /**
+     * List all variable or get refrence variable property detail.
+     * @param scopeId 0(Local) and 1(Global)
+     * @param args
+     */
+    public async listVariables(
+        args: DebugProtocol.VariablesArguments,
+    ): Promise<Variable[]> {
+        if (args.filter === 'named') {
+            return [];
+        }
 
-	public scopes(frameId: number): Scope[] {
-		return this.variableHandler.scopes(frameId)
-	}
+        if (args.filter === 'indexed') {
+            return this.variableHandler.getArrayValue(
+                args.variablesReference,
+                args.start,
+                args.count,
+            );
+        }
 
-	/**
-	 * List all variable or get refrence variable property detail.
-	 * @param scopeId 0(Local) and 1(Global)
-	 * @param args
-	 */
-	public async listVariables(args: DebugProtocol.VariablesArguments): Promise<Variable[]> {
+        const scope: number = this.variableHandler.getScopeByRef(
+            args.variablesReference,
+        );
+        const frameId: number = this.variableHandler.getFrameId();
 
-		if (args.filter === 'named') {
-			return [];
-		}
+        const propertyName = this.variableHandler.getVarByRef(
+            args.variablesReference,
+        )?.name;
+        if (propertyName) {
+            return this.getVariable(frameId, scope, propertyName);
+        }
 
-		if (args.filter === 'indexed') {
-			return this.variableHandler.getArrayValue(args.variablesReference, args.start, args.count);
-		}
+        const response = await this.sendComand(
+            `context_get -d ${frameId} -c ${scope}`,
+        );
 
-		const scope: number = this.variableHandler.getScopeByRef(args.variablesReference)
-		const frameId: number = this.variableHandler.getFrameId()
+        return this.variableHandler.parse(response, scope);
+    }
 
-		const propertyName = this.variableHandler.getVarByRef(args.variablesReference)?.name
-		if (propertyName) {
-			return this.getVariable(frameId, scope, propertyName)
-		}
+    public async getVariableByEval(variableName: string): Promise<string> {
+        const frameId: number = this.variableHandler.getFrameId();
 
-		const response = await this.sendComand(`context_get -d ${frameId} -c ${scope}`)
+        const variables = await this.getVariable(
+            frameId,
+            VarScope.LOCAL,
+            variableName,
+        );
+        if (variables.length == 0) {
+            return null;
+        } else if (variables.length == 1) {
+            return variables[0].value;
+        } else {
+            const ahkVar = this.variableHandler.getVarByName(variableName);
+            return JSON.stringify(ahkVar.value);
+        }
+    }
 
-		return this.variableHandler.parse(response, scope);
-	}
+    private async getVariable(
+        frameId: number,
+        scope: VarScope,
+        variableName: string,
+    ): Promise<Variable[]> {
+        const response = await this.sendComand(
+            `property_get -d ${frameId} -c ${scope} -n ${variableName}`,
+        );
+        return this.variableHandler.parsePropertyget(response, scope);
+    }
 
-	public async getVariableByEval(variableName: string): Promise<string> {
-		const frameId: number = this.variableHandler.getFrameId()
+    public async setVariable(
+        args: DebugProtocol.SetVariableArguments,
+    ): Promise<any> {
+        return this.variableHandler
+            .obtainValue(args.value)
+            .then(async ({ type, value, isVariable }) => {
+                const frameId: number = this.variableHandler.getFrameId();
+                const scope: number = this.variableHandler.getScopeByRef(
+                    args.variablesReference,
+                );
+                if (isVariable) {
+                    const ahkVar = (
+                        await this.getVariable(frameId, scope, value)
+                    )[0];
+                    if (!ahkVar) {
+                        throw new Error(`variable ${args.value} not found!`);
+                    }
+                    value = ahkVar.value;
+                    if (value.match(/^"|"$/g)) {
+                        type = 'string';
+                        value = value.replace(/^"|"$/g, '');
+                    }
+                }
+                const parentFullName: string = this.variableHandler.getVarByRef(
+                    args.variablesReference,
+                )?.name;
+                let fullname: string = args.name;
+                if (parentFullName) {
+                    const isIndex: boolean =
+                        fullname.includes('[') && fullname.includes(']');
+                    fullname =
+                        isIndex === true
+                            ? `${parentFullName}${fullname}`
+                            : `${parentFullName}.${fullname}`;
+                }
 
-		const variables = await this.getVariable(frameId, VarScope.LOCAL, variableName)
-		if (variables.length == 0) {
-			return null;
-		} else if (variables.length == 1) {
-			return variables[0].value
-		} else {
-			const ahkVar = this.variableHandler.getVarByName(variableName)
-			return JSON.stringify(ahkVar.value)
-		}
-	}
+                const response: DbgpResponse = await this.sendComand(
+                    `property_set -d ${frameId} -c ${scope} -n ${fullname} -t ${type}`,
+                    value,
+                );
+                const success = !!parseInt(response.attr.success);
+                if (success === false) {
+                    throw new Error(
+                        `"${fullname}" cannot be written. Probably read-only.`,
+                    );
+                }
+                const displayValue = type === 'string' ? `"${value}"` : value;
+                const PRIMITIVE = 0;
+                return {
+                    name: args.name,
+                    value: displayValue,
+                    type,
+                    variablesReference: PRIMITIVE,
+                };
+            });
+    }
 
-	private async getVariable(frameId: number, scope: VarScope, variableName: string): Promise<Variable[]> {
-		const response = await this.sendComand(`property_get -d ${frameId} -c ${scope} -n ${variableName}`)
-		return this.variableHandler.parsePropertyget(response, scope);
-	}
+    /**
+     * send get stack command and return stack result promise
+     * @param startFrame stack frame limit start
+     * @param endFrame  stack frame limit end
+     */
+    public async stack(
+        args: DebugProtocol.StackTraceArguments,
+    ): Promise<StackFrame[]> {
+        const response = await this.sendComand(`stack_get`);
+        return this.stackHandler.handle(args, response);
+    }
 
-	public async setVariable(args: DebugProtocol.SetVariableArguments): Promise<any> {
-		return this.variableHandler.obtainValue(args.value).then(async ({ type, value, isVariable }) => {
-			const frameId: number = this.variableHandler.getFrameId()
-			const scope: number = this.variableHandler.getScopeByRef(args.variablesReference)
-			if (isVariable) {
-				const ahkVar = (await this.getVariable(frameId, scope, value))[0]
-				if (!ahkVar) {
-					throw new Error(`variable ${args.value} not found!`);
-				}
-				value = ahkVar.value;
-				if (value.match(/^"|"$/g)) {
-					type = "string"
-					value = value.replace(/^"|"$/g, "")
-				}
-			}
-			const parentFullName: string = this.variableHandler.getVarByRef(args.variablesReference)?.name;
-			let fullname: string = args.name;
-			if (parentFullName) {
-				const isIndex: boolean = fullname.includes('[') && fullname.includes(']');
-				fullname = isIndex === true ? `${parentFullName}${fullname}` : `${parentFullName}.${fullname}`;
-			}
+    private async setBreakPonit(bp: DebugProtocol.Breakpoint) {
+        if (this.debugServer && bp.verified) {
+            const res = await this.sendComand(
+                `breakpoint_set -t line -f ${bp.source.path} -n ${bp.line}`,
+            );
+            bp.id = res.attr.id;
+        }
+    }
 
-			const response: DbgpResponse = await this.sendComand(`property_set -d ${frameId} -c ${scope} -n ${fullname} -t ${type}`, value);
-			const success = !!parseInt(response.attr.success);
-			if (success === false) {
-				throw new Error(`"${fullname}" cannot be written. Probably read-only.`);
-			}
-			const displayValue = type === 'string' ? `"${value}"` : value;
-			const PRIMITIVE = 0
-			return {
-				name: args.name,
-				value: displayValue,
-				type, variablesReference: PRIMITIVE,
-			};
-		})
+    public buildBreakPoint(
+        path: string,
+        sourceBreakpoints: DebugProtocol.SourceBreakpoint[],
+    ) {
+        this.clearBreakpoints(path);
+        return this.breakPointHandler.buildBreakPoint(
+            path,
+            sourceBreakpoints,
+            (bp) => {
+                this.setBreakPonit(bp);
+            },
+        );
+    }
 
-	}
+    /**
+     * Clear all breakpoints for file.
+     * @param path file path
+     */
+    private clearBreakpoints(path: string): void {
+        let bps: DebugProtocol.Breakpoint[];
+        if (this.debugServer && (bps = this.breakPointHandler.get(path))) {
+            for (const bp of bps) {
+                this.sendComand(`breakpoint_remove -d ${bp.id}`);
+            }
+        }
+    }
 
-	/**
-	 * send get stack command and return stack result promise
-	 * @param startFrame stack frame limit start
-	 * @param endFrame  stack frame limit end
-	 */
-	public async stack(args: DebugProtocol.StackTraceArguments): Promise<StackFrame[]> {
-		const response = await this.sendComand(`stack_get`);
-		return this.stackHandler.handle(args, response)
-	}
-
-	private async setBreakPonit(bp: DebugProtocol.Breakpoint) {
-		if (this.debugServer && bp.verified) {
-			const res = await this.sendComand(`breakpoint_set -t line -f ${bp.source.path} -n ${bp.line}`)
-			bp.id = res.attr.id
-		}
-	}
-
-	public buildBreakPoint(path: string, sourceBreakpoints: DebugProtocol.SourceBreakpoint[]) {
-		this.clearBreakpoints(path)
-		return this.breakPointHandler.buildBreakPoint(path, sourceBreakpoints, (bp) => { this.setBreakPonit(bp) });
-	}
-
-	/**
-	 * Clear all breakpoints for file.
-	 * @param path file path
-	 */
-	private clearBreakpoints(path: string): void {
-		let bps: DebugProtocol.Breakpoint[];
-		if (this.debugServer && (bps = this.breakPointHandler.get(path))) {
-			for (const bp of bps) {
-				this.sendComand(`breakpoint_remove -d ${bp.id}`);
-			}
-		}
-	}
-
-	private processRunResponse(response: DbgpResponse) {
-		switch (response.attr.status) {
-			case 'break':
-				this.emit('break', response.attr.command)
-				break;
-			case 'stopping':
-			case 'stopped':
-				this.end();
-				break;
-		}
-	}
-
+    private processRunResponse(response: DbgpResponse) {
+        switch (response.attr.status) {
+            case 'break':
+                this.emit('break', response.attr.command);
+                break;
+            case 'stopping':
+            case 'stopped':
+                this.end();
+                break;
+        }
+    }
 }

@@ -1,36 +1,36 @@
 // A launch configuration that compiles the extension and then opens it inside a new window
 {
-	"version": "0.2.0",
-	"configurations": [
-		{
+    "version": "0.2.0",
+    "configurations": [
+        {
             "name": "Extension",
             "type": "extensionHost",
             "request": "launch",
-            "args": ["--extensionDevelopmentPath=${workspaceRoot}" ],
-            "outFiles": [ "${workspaceRoot}/out/**/*.js" ],
+            "args": ["--extensionDevelopmentPath=${workspaceRoot}"],
+            "outFiles": ["${workspaceRoot}/out/**/*.js"],
             "preLaunchTask": "dev"
         },
-		{
-			"type": "ahk",
-			"request": "launch",
-			"name": "Autohotkey v1 Debugger",
-			"program": "${workspaceFolder}/demos/demo_for_ahk_v1.ahk",
-			"runtime": "C:\\Program Files\\Autohotkey\\AutoHotkeyU64.exe",
-			"stopOnEntry": false,
-			"dbgpSettings": {
-				"max_children": 149,
-			}
-		},
-		{
-			"type": "ahk",
-			"request": "launch",
-			"name": "Autohotkey v2 Debugger",
-			"program": "${workspaceFolder}/demos/demo_for_ahk_v2.ahk",
-			"runtime": "C:\\Program Files\\AutoHotkey\\v2-alpha\\x64\\AutoHotkey.exe", // Default value of Scite for ahk v2
-			"stopOnEntry": false,
-			"dbgpSettings": {
-				"max_children": 149,
-			}
-		}
-	]
+        {
+            "type": "ahk",
+            "request": "launch",
+            "name": "Autohotkey v1 Debugger",
+            "program": "${workspaceFolder}/demos/demo_for_ahk_v1.ahk",
+            "runtime": "C:\\Program Files\\Autohotkey\\AutoHotkeyU64.exe",
+            "stopOnEntry": false,
+            "dbgpSettings": {
+                "max_children": 149
+            }
+        },
+        {
+            "type": "ahk",
+            "request": "launch",
+            "name": "Autohotkey v2 Debugger",
+            "program": "${workspaceFolder}/demos/demo_for_ahk_v2.ahk",
+            "runtime": "C:\\Program Files\\AutoHotkey\\v2-alpha\\x64\\AutoHotkey.exe", // Default value of Scite for ahk v2
+            "stopOnEntry": false,
+            "dbgpSettings": {
+                "max_children": 149
+            }
+        }
+    ]
 }
