@@ -26,15 +26,18 @@
     "scripts": {
         "build": "rimraf out && node build.js --mode=production",
         "dev": "rimraf out && node build.js",
+        "eslint": "npm run eslint_inner -- src && echo No ESLint problems",
+        "eslint_fix": "npm run eslint_inner -- --fix src",
+        "eslint_inner": "eslint --ext ts --max-warnings=0",
         "format": "npm run format_inner -- --check .",
         "format_fix": "npm run format_inner -- --write .",
         "format_inner": "prettier",
-        "lint": "eslint src/**/*.ts",
-        "lint:fix": "eslint src/**/*.ts --fix",
+        "lint": "npm run tsc && npm run eslint && npm run format && npm run packagejson",
         "packagejson": "sort-package-json --check",
         "packagejson:fix": "sort-package-json",
         "publish": "vsce publish",
-        "validate": "npm run packagejson && npm run build",
+        "tsc": "tsc --noEmit --skipLibCheck && echo No TSC problems",
+        "validate": "npm run lint && npm run build",
         "vscode:prepublish": "npm run build"
     },
     "contributes": {
@@ -281,6 +284,10 @@
     ],
     "lint-staged": {
         "*": "prettier --check",
+        "src/**/*.ts": [
+            "npm run eslint_inner",
+            "npm run tsc"
+        ],
         "package.json": "npm run packagejson"
     },
     "dependencies": {

@@ -1,16 +1,14 @@
 import * as vscode from 'vscode';
 
 export class Global {
-    public static CONFIG_PREFIX = 'vscode-ahk-plus';
+    public static configPrefix = 'vscode-ahk-plus';
     private static statusBarItem: vscode.StatusBarItem;
     /**
      * get configuration from vscode setting.
      * @param key config key
      */
     public static getConfig<T>(key: string): T {
-        return vscode.workspace
-            .getConfiguration(this.CONFIG_PREFIX)
-            .get<T>(key);
+        return vscode.workspace.getConfiguration(this.configPrefix).get<T>(key);
     }
 
     public static updateStatusBarItems(text: string) {

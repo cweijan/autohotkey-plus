@@ -62,9 +62,15 @@ export class DebugDispather extends EventEmitter {
 
     private async initDebugger(
         args: LaunchRequestArguments,
+        // AHK uses these variable names, let's keep them for now
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         dbgpSettings: { max_children?: number; max_data?: number } = {},
     ) {
-        if (this.port) return;
+        if (this.port) {
+            return;
+        }
+        // AHK uses these variable names, let's keep them for now
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         const { max_children = 300, max_data = 131072 } = dbgpSettings;
         this.breakPointHandler = new BreakPointHandler();
         this.stackHandler = new StackHandler();
@@ -205,12 +211,12 @@ export class DebugDispather extends EventEmitter {
 
         const variables = await this.getVariable(
             frameId,
-            VarScope.LOCAL,
+            VarScope.local,
             variableName,
         );
-        if (variables.length == 0) {
+        if (!variables.length) {
             return null;
-        } else if (variables.length == 1) {
+        } else if (variables.length === 1) {
             return variables[0].value;
         } else {
             const ahkVar = this.variableHandler.getVarByName(variableName);
