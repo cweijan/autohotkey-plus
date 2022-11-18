@@ -24,8 +24,12 @@
     "publisher": "cweijan",
     "main": "./out/extension",
     "scripts": {
-        "build": "rimraf out && node build.js --mode=production",
-        "dev": "rimraf out && node build.js",
+        "build": "npm run rebuild -- --mode=production",
+        "clean": "rimraf out && npm run compile_grammar",
+        "compile": "npm run clean && npm run compile_ts",
+        "compile_grammar": "echo Nothing to compile :)",
+        "compile_ts": "tsc -p ./",
+        "dev": "npm run rebuild",
         "eslint": "npm run eslint_inner -- src && echo No ESLint problems",
         "eslint_fix": "npm run eslint_inner -- --fix src",
         "eslint_inner": "eslint --ext ts --max-warnings=0",
@@ -34,11 +38,19 @@
         "format_inner": "prettier",
         "lint": "npm run tsc && npm run eslint && npm run format && npm run packagejson",
         "packagejson": "sort-package-json --check",
-        "packagejson:fix": "sort-package-json",
+        "packagejson_fix": "sort-package-json",
+        "prepare": "husky install",
         "publish": "vsce publish",
+        "rebuild": "npm run clean && node build.js",
+        "pretest": "npm run compile",
+        "test": "npm run test_unit && npm run test_grammar_inner",
+        "test_grammar": "npm run compile_grammar && npm run test_grammar_inner",
+        "test_grammar_inner": "echo vscode-tmgrammar-snap src/test/suite/grammar/samples/*.ahk (not implemented)",
+        "test_unit": "echo node ./out/test/runTest.js (not implemented)",
         "tsc": "tsc --noEmit --skipLibCheck && echo No TSC problems",
-        "validate": "npm run lint && npm run build",
-        "vscode:prepublish": "npm run build"
+        "validate": "npm run lint && npm run test && npm run build",
+        "vscode:prepublish": "npm run build",
+        "watch": "tsc -watch -p ./"
     },
     "contributes": {
         "breakpoints": [
@@ -297,6 +309,8 @@
         "xml2js": "^0.4.23"
     },
     "devDependencies": {
+        "@types/fs-extra": "^9.0.13",
+        "@types/mocha": "^10.0.0",
         "@types/node": "^17.0.23",
         "@types/vscode": "^1.50.0",
         "@typescript-eslint/eslint-plugin": "^5.37.0",
@@ -304,8 +318,11 @@
         "esbuild": "^0.15.7",
         "esbuild-plugin-eslint": "^0.1.1",
         "eslint": "^8.23.1",
+        "fs-extra": "^10.1.0",
         "husky": "^8.0.1",
         "lint-staged": "^13.0.3",
+        "mocha": "^10.1.0",
+        "prettier": "^2.6.1",
         "rimraf": "^3.0.2",
         "sort-package-json": "^1.57.0",
         "typescript": "^4.6.3"
