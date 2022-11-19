@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.0 - unreleased
+
+-   Major formatter changes
+
 ## 2.7.1 - 2022-09-16
 
 -   Better debugger interaction.
