@@ -2,7 +2,67 @@
 
 ## 3.0.0 - unreleased
 
--   Major formatter changes
+### Major formatter changes
+
+Formatter options now available in settings:
+
+-   `allowedNumberOfEmptyLines` removes extra empty lines (defaults to 1, can be disabled)
+-   `indentCodeAfterLabel` defaults to `true`
+-   `indentCodeAfterSharpDirective` defaults to `true`
+-   `preserveIndent` keeps whitespace on empty lines. Defaults to `false`
+-   `trimExtraSpaces` trims extra spaces between words. Defaults to `true`
+
+Formatter directives:
+
+-   `AlignAssignment` aligns blocks of assignments:
+
+    ```ahk
+    ;@AHK++AlignAssignmentOn
+    a=5
+    str = legacy text = with equal symbol
+    inputFile:="movie.mkv"
+    ; more variables below!
+    abc := "abc"
+    abc := a + b
+    ;@AHK++AlignAssignmentOff
+    ```
+
+    becomes
+
+    ```ahk
+    ;@AHK++AlignAssignmentOn
+    a          = 5
+    str        = legacy text = with equal symbol
+    inputFile := "movie.mkv"
+    ; more variables below!
+    abc       := "abc"
+    abc       := a + b
+    ;@AHK++AlignAssignmentOff
+    ```
+
+-   `FormatBlockComment` tries to format block comments like code:
+
+    ```ahk
+    ;@AHK++FormatBlockCommentOn
+    /*
+    typedef struct TEST {
+    DWORD cbSize ; 0
+    } CMINVOKECOMMANDINFOEX;
+    */
+    ```
+
+    becomes
+
+    ```ahk
+    ;@AHK++FormatBlockCommentOn
+    /*
+    typedef struct TEST {
+        DWORD cbSize ; 0
+    } CMINVOKECOMMANDINFOEX;
+    */
+    ```
+
+And many, many bugfixes!
 
 ## 2.7.1 - 2022-09-16
 

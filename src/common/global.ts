@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
 export class Global {
+    // config prefix from package.json contributes.configuration.properties
     public static configPrefix = 'vscode-ahk-plus';
     private static statusBarItem: vscode.StatusBarItem;
     /**
@@ -27,11 +28,16 @@ export class Global {
 }
 
 export enum ConfigKey {
+    allowedNumberOfEmptyLines = 'formatter.allowedNumberOfEmptyLines',
     compilePath = 'compilePath',
     compileIcon = 'compileIcon',
     compileBaseFile = 'compileBaseFile',
     compileMpress = 'compileMpress',
+    documentPath = 'documentPath',
     executePath = 'executePath',
     enableIntelliSense = 'enableIntelliSense',
-    documentPath = 'documentPath',
+    indentCodeAfterLabel = 'formatter.indentCodeAfterLabel',
+    indentCodeAfterSharpDirective = 'formatter.indentCodeAfterSharpDirective',
+    preserveIndent = 'formatter.preserveIndent',
+    trimExtraSpaces = 'formatter.trimExtraSpaces',
 }
