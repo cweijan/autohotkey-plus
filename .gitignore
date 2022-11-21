@@ -1,9 +1,16 @@
+# Contents of this file are also in `.prettierignore`
+
+# Folders
+.idea/
+.@vscode/test-electron/
+.vscode-test/
+node_modules
 out
 node_modules
 .vscode-test/
-*.vsix
 
+# Files
 .vscode/settings.json
-
+*.vsix
 # ignore compiled JSON, keep YAML
 language/ahk.tmLanguage.json
