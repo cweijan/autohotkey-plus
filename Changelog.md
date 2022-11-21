@@ -64,6 +64,46 @@ Formatter directives:
 
 And many, many bugfixes!
 
+### Commands
+
+AHK commands are now in the "AutoHotkey Plus" category
+
+Commands have been renamed, and some have been given new keybindings.
+
+We've also added a new command to compile with the AHK GUI. It's available in the context/right-click menu.
+
+| Old name                 | New name                 | New default keybinding             |
+| ------------------------ | ------------------------ | ---------------------------------- |
+| Open AutoHotkey Document | Open AutoHotkey Help     | Ctrl + F1                          |
+| Compile Script           | Compile AHK Script       | Ctrl + Shift + F9 (same as before) |
+| Run Script               | Run AHK Script           | Ctrl + F9 (same as before)         |
+| Run Selection Script     | Run Selection            | Ctrl + F8                          |
+| Debug Script             | Debug AHK Script         | F9 (same as before)                |
+| (new command)            | Compile AHK Script (GUI) | (none)                             |
+
+### Settings
+
+Along with the formatter changes, some settings have been renamed. Default values have not been changed.
+
+| Old name             | New name            |
+| -------------------- | ------------------- |
+| Compile MPRESS       | Use MPRESS          |
+| Document path        | Help path           |
+| Enable Intelli Sense | Enable IntelliSense |
+
+A new setting, `Show debug button`, shows or hides the debug button in the editor title menu. It defaults to `true`.
+
+### Syntax highlighting
+
+Minor bugfixes for syntax highlighting.
+
+### Developer-only changes
+
+-   Now using [YAML grammar](https://code.visualstudio.com/api/language-extensions/syntax-highlight-guide#:~:text=USING%20YAML%20TO%20WRITE%20A%20GRAMMAR) for readability
+-   Added many more unit tests
+-   Added grammar tests
+-   Add documentation
+
 ## 2.7.1 - 2022-09-16
 
 -   Better debugger interaction.

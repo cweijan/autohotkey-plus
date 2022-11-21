@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 export class Global {
     // config prefix from package.json contributes.configuration.properties
-    public static configPrefix = 'vscode-ahk-plus';
+    public static configPrefix = 'AutohotkeyPlus';
     private static statusBarItem: vscode.StatusBarItem;
     /**
      * get configuration from vscode setting.
@@ -29,13 +29,13 @@ export class Global {
 
 export enum ConfigKey {
     allowedNumberOfEmptyLines = 'formatter.allowedNumberOfEmptyLines',
-    compilePath = 'compilePath',
-    compileIcon = 'compileIcon',
-    compileBaseFile = 'compileBaseFile',
-    compileMpress = 'compileMpress',
-    documentPath = 'documentPath',
-    executePath = 'executePath',
-    enableIntelliSense = 'enableIntelliSense',
+    compileBaseFile = 'compile.compileBaseFile',
+    compileIcon = 'compile.compileIcon',
+    useMpress = 'compile.useMpress',
+    compilePath = 'file.compilePath',
+    enableIntellisense = 'language.enableIntellisense',
+    executePath = 'file.executePath',
+    helpPath = 'file.helpPath',
     indentCodeAfterLabel = 'formatter.indentCodeAfterLabel',
     indentCodeAfterSharpDirective = 'formatter.indentCodeAfterSharpDirective',
     preserveIndent = 'formatter.preserveIndent',

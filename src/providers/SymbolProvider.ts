@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { Parser } from '../parser/parser';
 
-export class SymBolProvider implements vscode.DocumentSymbolProvider {
+export class SymbolProvider implements vscode.DocumentSymbolProvider {
     public async provideDocumentSymbols(
         document: vscode.TextDocument,
         token: vscode.CancellationToken,
