@@ -8,6 +8,6 @@ images/**
 node_modules/
 .gitignore
 tsconfig.json
-.eslintrc.js
+.eslintrc
 build.js
 .github/

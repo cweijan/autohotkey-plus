@@ -6,8 +6,6 @@
 .vscode-test/
 node_modules
 out
-node_modules
-.vscode-test/
 
 # Files
 .vscode/settings.json

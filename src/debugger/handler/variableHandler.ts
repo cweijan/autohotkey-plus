@@ -144,7 +144,7 @@ export class VariableHandler {
     private buildVariableValue(property: DbgpProperty): any {
         const { attr, content = '' } = property;
 
-        if (['string', 'integer', 'float'].includes(attr.type) === true) {
+        if (['string', 'integer', 'float'].includes(attr.type)) {
             const primitive = Util.atob(content);
             if (attr.type === 'integer' || attr.type === 'float') {
                 return primitive;
@@ -171,7 +171,7 @@ export class VariableHandler {
     private formatPropertyValue(property: DbgpProperty): string {
         const { attr, content = '' } = property;
 
-        if (['string', 'integer', 'float'].includes(attr.type) === true) {
+        if (['string', 'integer', 'float'].includes(attr.type)) {
             const primitive = Buffer.from(content, attr.encoding).toString();
 
             if (attr.type === 'integer' || attr.type === 'float') {

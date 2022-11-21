@@ -14,7 +14,7 @@ import { Global, ConfigKey } from './common/global';
 import { AhkRenameProvider } from './providers/ahkRenameProvider';
 import { SignatureProvider } from './providers/signatureProvider';
 import { CompletionProvider } from './providers/completionProvider';
-import { DocumentService } from './service/documentService';
+import { HelpService } from './service/helpService';
 
 export function activate(context: vscode.ExtensionContext) {
     const commandPrefix = 'AutohotkeyPlus';
@@ -70,7 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
             RunnerService.startDebugger(),
         ),
         vscode.commands.registerCommand(`${commandPrefix}.openHelp`, () =>
-            DocumentService.open(),
+            HelpService.open(),
         ),
         vscode.commands.registerCommand(`${commandPrefix}.run`, () =>
             RunnerService.run(),
