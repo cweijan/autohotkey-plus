@@ -3,23 +3,47 @@ import * as vscode from 'vscode';
 import { FileManager, FileModel } from '../common/fileManager';
 import { ConfigKey, Global } from '../common/global';
 import { Process } from '../common/processWrapper';
+import * as fs from 'fs'; // In NodeJS: 'const fs = require('fs')'
+
+export const makeCompileCommand = (
+    compilePath: string,
+    scriptPath: string,
+    showGui: boolean,
+    compileIcon: string,
+    compileBaseFile: string,
+    useMpress: boolean,
+): string => {
+    if (!compilePath || !scriptPath) {
+        return '';
+    }
+    const pos = scriptPath.lastIndexOf('.');
+    const exePath =
+        scriptPath.substring(0, pos < 0 ? scriptPath.length : pos) + '.exe';
+    const guiCommand = showGui ? '/gui' : '';
+    const compileIconCommand = compileIcon ? `/icon "${compileIcon}"` : '';
+    const compileBaseFileCommand = compileBaseFile
+        ? `/bin "${compileBaseFile}"`
+        : '';
+    const compileMpressCommand = useMpress ? '/mpress 1' : '';
+    return `"${compilePath}" ${guiCommand} /in "${scriptPath}" /out "${exePath}" ${compileIconCommand} ${compileBaseFileCommand} ${compileMpressCommand}`;
+};
 
 export class RunnerService {
+    /** Runs the editor selection as a standalone script. */
     public static async runSelection(): Promise<void> {
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
-            vscode.window.showErrorMessage('Not active editor found!');
+            vscode.window.showErrorMessage('No active editor found!');
             return;
         }
 
         const selection = editor.selection;
         const text = editor.document.getText(selection);
+        // oooo a merge commit
         this.run(await this.createTemplate(text));
     }
 
-    /**
-     * start debuggin session
-     */
+    /** Start debug session */
     public static async startDebugger(script?: string) {
         const cwd = script
             ? vscode.Uri.file(script)
@@ -31,16 +55,13 @@ export class RunnerService {
         vscode.debug.startDebugging(vscode.workspace.getWorkspaceFolder(cwd), {
             type: debugPlusExists ? 'autohotkey' : 'ahk',
             request: 'launch',
-            name: 'Autohotkey Debugger',
-            runtime: Global.getConfig(ConfigKey.executePath),
+            name: 'AutoHotkey Debugger',
+            runtime: Global.getConfig<string>(ConfigKey.executePath),
             program: script,
         });
     }
 
-    /**
-     * run script
-     * @param path execute script path
-     */
+    /** Runs the script at the specified path */
     public static async run(path?: string): Promise<void> {
         const executePath = Global.getConfig(ConfigKey.executePath);
         this.checkAndSaveActive();
@@ -53,38 +74,45 @@ export class RunnerService {
     }
 
     /**
-     * compile current script
+     * Compiles current script
      */
-    public static async compile() {
+    public static async compile(showGui: boolean) {
         const currentPath = vscode.window.activeTextEditor.document.uri.fsPath;
-        if (!currentPath) {
-            vscode.window.showErrorMessage(
-                'Unsupport compile template scripts.',
-            );
+        if (!fs.existsSync(currentPath)) {
+            vscode.window.showErrorMessage('Cannot compile never-saved files.');
             return;
         }
         this.checkAndSaveActive();
         const pos = currentPath.lastIndexOf('.');
-        const compilePath =
-            currentPath.substr(0, pos < 0 ? currentPath.length : pos) + '.exe';
 
-        let compileIcon = Global.getConfig(ConfigKey.compileIcon);
-        compileIcon = compileIcon ? `/icon "${compileIcon}"` : '';
-        let compileBaseFile = Global.getConfig(ConfigKey.compileBaseFile);
-        compileBaseFile = compileBaseFile ? `/bin "${compileBaseFile}"` : '';
-        const compileMpress = Global.getConfig(ConfigKey.compileMpress)
-            ? '/mpress 1'
-            : '';
+        const compilePath = Global.getConfig<string>(ConfigKey.compilePath);
+        const compileIcon = Global.getConfig<string>(ConfigKey.compileIcon);
+        const compileBaseFile = Global.getConfig<string>(
+            ConfigKey.compileBaseFile,
+        );
+        const useMpress = Global.getConfig<boolean>(ConfigKey.useMpress);
 
-        const compileCommand = `"${Global.getConfig(
-            ConfigKey.compilePath,
-        )}" /in "${currentPath}" /out "${compilePath}" ${compileIcon} ${compileBaseFile} ${compileMpress}`;
+        const compileCommand = makeCompileCommand(
+            compilePath,
+            currentPath,
+            showGui,
+            compileIcon,
+            compileBaseFile,
+            useMpress,
+        );
+
+        if (!compileCommand) {
+            vscode.window.showErrorMessage('Cannot build compile command.');
+            return;
+        }
+
         if (
-            await Process.exec(compileCommand, {
+            (await Process.exec(compileCommand, {
                 cwd: `${res(currentPath, '..')}`,
-            })
+            })) &&
+            !showGui
         ) {
-            vscode.window.showInformationMessage('compile success!');
+            vscode.window.showInformationMessage('Compile success!');
         }
     }
 

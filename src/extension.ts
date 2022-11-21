@@ -6,7 +6,7 @@ import { DebugSession } from './debugger/debugSession';
 import { DefProvider } from './providers/defProvider';
 import { TemplateService } from './service/templateService';
 import { FormatProvider } from './providers/formattingProvider';
-import { SymBolProvider } from './providers/SymbolProvider';
+import { SymbolProvider } from './providers/symbolProvider';
 import { FileManager } from './common/fileManager';
 import { AhkHoverProvider } from './providers/ahkHoverProvider';
 import { RefProvider } from './providers/refProvider';
@@ -17,8 +17,9 @@ import { CompletionProvider } from './providers/completionProvider';
 import { DocumentService } from './service/documentService';
 
 export function activate(context: vscode.ExtensionContext) {
+    const commandPrefix = 'AutohotkeyPlus';
     (async () => {
-        Global.updateStatusBarItems('Indexing Autohotkey Workspace...');
+        Global.updateStatusBarItems('Indexing AutoHotkey Workspace...');
         await Parser.buildByPath(vscode.workspace.rootPath);
         Global.updateStatusBarItems('Index Workspace Success!');
         Global.hide();
@@ -47,7 +48,7 @@ export function activate(context: vscode.ExtensionContext) {
         ),
         vscode.languages.registerDocumentSymbolProvider(
             language,
-            new SymBolProvider(),
+            new SymbolProvider(),
         ),
         vscode.languages.registerDocumentFormattingEditProvider(
             language,
@@ -58,23 +59,28 @@ export function activate(context: vscode.ExtensionContext) {
             'ahk',
             new InlineDebugAdapterFactory(),
         ),
-        TemplateService.createEditorListenr(),
-        vscode.commands.registerCommand('run.ahk', () => RunnerService.run()),
-        vscode.commands.registerCommand('run.selection.ahk', () =>
-            RunnerService.runSelection(),
+        TemplateService.createEditorListener(),
+        vscode.commands.registerCommand(`${commandPrefix}.compile`, () =>
+            RunnerService.compile(false),
         ),
-        vscode.commands.registerCommand('document.open', () =>
-            DocumentService.open(),
+        vscode.commands.registerCommand(`${commandPrefix}.compilerGui`, () =>
+            RunnerService.compile(true),
         ),
-        vscode.commands.registerCommand('debug.ahk', () =>
+        vscode.commands.registerCommand(`${commandPrefix}.debug`, () =>
             RunnerService.startDebugger(),
         ),
-        vscode.commands.registerCommand('compile.ahk', () =>
-            RunnerService.compile(),
+        vscode.commands.registerCommand(`${commandPrefix}.openHelp`, () =>
+            DocumentService.open(),
+        ),
+        vscode.commands.registerCommand(`${commandPrefix}.run`, () =>
+            RunnerService.run(),
+        ),
+        vscode.commands.registerCommand(`${commandPrefix}.runSelection`, () =>
+            RunnerService.runSelection(),
         ),
     );
 
-    if (Global.getConfig(ConfigKey.enableIntelliSense)) {
+    if (Global.getConfig<boolean>(ConfigKey.enableIntellisense)) {
         context.subscriptions.push(
             vscode.languages.registerCompletionItemProvider(
                 language,
