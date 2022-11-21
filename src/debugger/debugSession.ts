@@ -9,15 +9,15 @@ import {
     Thread,
 } from '@vscode/debugadapter';
 import { DebugProtocol } from '@vscode/debugprotocol';
-import { DebugDispather } from './debugDispather';
+import { DebugDispatcher } from './debugDispatcher';
 import { Continue } from './struct/command';
 import { VscodeScope } from './struct/scope';
 
 /**
- * This interface describes the mock-debug specific launch attr
+ * This interface describes the mock-debug specific launch attributes
  * (which are not part of the Debug Adapter Protocol).
- * The schema for these attr lives in the package.json of the mock-debug extension.
- * The interface should always match this schema.
+ * The schema for these attributes lives in the package.json of the mock-debug extension.
+ * The interface should always match the one in package.json.
  */
 export interface LaunchRequestArguments
     extends DebugProtocol.LaunchRequestArguments {
@@ -26,7 +26,6 @@ export interface LaunchRequestArguments
     /** An absolute path to the AutoHotkey.exe. */
     runtime: string;
     dbgpSettings: {
-        // AHK uses these variable names, let's keep them for now
         // eslint-disable-next-line @typescript-eslint/naming-convention
         max_children?: number;
         // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -39,7 +38,7 @@ export interface LaunchRequestArguments
  */
 export class DebugSession extends LoggingDebugSession {
     private static threadId = 1;
-    private dispather: DebugDispather;
+    private dispatcher: DebugDispatcher;
 
     public constructor() {
         super('ahk-debug.txt');
@@ -48,8 +47,8 @@ export class DebugSession extends LoggingDebugSession {
         this.setDebuggerLinesStartAt1(false);
         this.setDebuggerColumnsStartAt1(false);
 
-        this.dispather = new DebugDispather();
-        this.dispather
+        this.dispatcher = new DebugDispatcher();
+        this.dispatcher
             .on('break', (reason: string) => {
                 this.sendEvent(new StoppedEvent(reason, DebugSession.threadId));
             })
@@ -98,7 +97,7 @@ export class DebugSession extends LoggingDebugSession {
         args: DebugProtocol.RestartArguments,
         request?: DebugProtocol.Request,
     ): void {
-        this.dispather.restart();
+        this.dispatcher.restart();
         this.sendResponse(response);
     }
 
@@ -106,7 +105,7 @@ export class DebugSession extends LoggingDebugSession {
         response: DebugProtocol.LaunchResponse,
         args: LaunchRequestArguments,
     ) {
-        this.dispather.start(args);
+        this.dispatcher.start(args);
         this.sendResponse(response);
     }
 
@@ -115,7 +114,6 @@ export class DebugSession extends LoggingDebugSession {
         args: DebugProtocol.DisconnectArguments,
         request?: DebugProtocol.Request,
     ): void {
-        // this.dispather.stop();
         this.sendResponse(response);
     }
 
@@ -124,7 +122,7 @@ export class DebugSession extends LoggingDebugSession {
         args: DebugProtocol.TerminateArguments,
         request?: DebugProtocol.Request,
     ): void {
-        this.dispather.stop();
+        this.dispatcher.stop();
         this.sendResponse(response);
     }
 
@@ -133,7 +131,7 @@ export class DebugSession extends LoggingDebugSession {
         args: DebugProtocol.SetBreakpointsArguments,
     ): Promise<void> {
         response.body = {
-            breakpoints: this.dispather.buildBreakPoint(
+            breakpoints: this.dispatcher.buildBreakPoint(
                 args.source.path,
                 args.breakpoints,
             ),
@@ -145,7 +143,7 @@ export class DebugSession extends LoggingDebugSession {
         response: DebugProtocol.StackTraceResponse,
         args: DebugProtocol.StackTraceArguments,
     ): Promise<void> {
-        response.body = { stackFrames: await this.dispather.stack(args) };
+        response.body = { stackFrames: await this.dispatcher.stack(args) };
         this.sendResponse(response);
     }
 
@@ -153,7 +151,7 @@ export class DebugSession extends LoggingDebugSession {
         response: DebugProtocol.ScopesResponse,
         args: DebugProtocol.ScopesArguments,
     ): void {
-        response.body = { scopes: this.dispather.scopes(args.frameId) };
+        response.body = { scopes: this.dispatcher.scopes(args.frameId) };
         this.sendResponse(response);
     }
 
@@ -162,7 +160,9 @@ export class DebugSession extends LoggingDebugSession {
         args: DebugProtocol.VariablesArguments,
         request?: DebugProtocol.Request,
     ) {
-        response.body = { variables: await this.dispather.listVariables(args) };
+        response.body = {
+            variables: await this.dispatcher.listVariables(args),
+        };
         this.sendResponse(response);
     }
 
@@ -172,7 +172,7 @@ export class DebugSession extends LoggingDebugSession {
         request?: DebugProtocol.Request,
     ): Promise<void> {
         try {
-            response.body = await this.dispather.setVariable(args);
+            response.body = await this.dispatcher.setVariable(args);
             this.sendResponse(response);
         } catch (error) {
             this.sendErrorResponse(response, {
@@ -187,7 +187,7 @@ export class DebugSession extends LoggingDebugSession {
         args: DebugProtocol.PauseArguments,
         request?: DebugProtocol.Request,
     ): void {
-        this.dispather.sendComand(Continue.break);
+        this.dispatcher.sendCommand(Continue.break);
         this.sendResponse(response);
     }
 
@@ -195,7 +195,7 @@ export class DebugSession extends LoggingDebugSession {
         response: DebugProtocol.ContinueResponse,
         args: DebugProtocol.ContinueArguments,
     ): void {
-        this.dispather.sendComand(Continue.run);
+        this.dispatcher.sendCommand(Continue.run);
         this.sendResponse(response);
     }
 
@@ -203,7 +203,7 @@ export class DebugSession extends LoggingDebugSession {
         response: DebugProtocol.NextResponse,
         args: DebugProtocol.NextArguments,
     ): void {
-        this.dispather.sendComand(Continue.stepOver);
+        this.dispatcher.sendCommand(Continue.stepOver);
         this.sendResponse(response);
     }
 
@@ -212,7 +212,7 @@ export class DebugSession extends LoggingDebugSession {
         args: DebugProtocol.StepInArguments,
         request?: DebugProtocol.Request,
     ): void {
-        this.dispather.sendComand(Continue.stepInto);
+        this.dispatcher.sendCommand(Continue.stepInto);
         this.sendResponse(response);
     }
 
@@ -221,7 +221,7 @@ export class DebugSession extends LoggingDebugSession {
         args: DebugProtocol.StepOutArguments,
         request?: DebugProtocol.Request,
     ): void {
-        this.dispather.sendComand(Continue.stepOut);
+        this.dispatcher.sendCommand(Continue.stepOut);
         this.sendResponse(response);
     }
 
@@ -238,10 +238,10 @@ export class DebugSession extends LoggingDebugSession {
     ): Promise<void> {
         response.body = {
             targets: [
-                ...(await this.dispather.listVariables({
+                ...(await this.dispatcher.listVariables({
                     variablesReference: VscodeScope.local,
                 })),
-                ...(await this.dispather.listVariables({
+                ...(await this.dispatcher.listVariables({
                     variablesReference: VscodeScope.global,
                 })),
             ].map((variable) => {
@@ -262,9 +262,9 @@ export class DebugSession extends LoggingDebugSession {
         const exp = args.expression.split('=');
         let reply: string;
         if (exp.length === 1) {
-            reply = await this.dispather.getVariableByEval(args.expression);
+            reply = await this.dispatcher.getVariableByEval(args.expression);
         } else {
-            this.dispather.setVariable({
+            this.dispatcher.setVariable({
                 name: exp[0],
                 value: exp[1],
                 variablesReference: VscodeScope.local,

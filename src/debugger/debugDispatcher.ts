@@ -21,7 +21,7 @@ import { Global, ConfigKey } from '../common/global';
  * A Ahk runtime debugger.
  * refrence: https://xdebug.org/docs/dbgp
  */
-export class DebugDispather extends EventEmitter {
+export class DebugDispatcher extends EventEmitter {
     private port: number;
     private debugServer: DebugServer;
     private breakPointHandler: BreakPointHandler;
@@ -89,14 +89,14 @@ export class DebugDispather extends EventEmitter {
                 this.breakPointHandler.loopPoints((bp) => {
                     this.setBreakPonit(bp);
                 });
-                this.sendComand(
+                this.sendCommand(
                     `feature_set -n max_children -v ${max_children}`,
                 );
-                this.sendComand(`feature_set -n max_data -v ${max_data}`);
-                this.sendComand(`feature_set -n max_depth -v 2`); // Get properties recursively. Therefore fixed at 2
-                this.sendComand('stdout -c 1');
-                this.sendComand('stderr -c 1');
-                this.sendComand('run');
+                this.sendCommand(`feature_set -n max_data -v ${max_data}`);
+                this.sendCommand(`feature_set -n max_depth -v 2`); // Get properties recursively. Therefore fixed at 2
+                this.sendCommand('stdout -c 1');
+                this.sendCommand('stderr -c 1');
+                this.sendCommand('run');
             })
             .on('stream', (stream) => {
                 this.emit(
@@ -131,15 +131,15 @@ export class DebugDispather extends EventEmitter {
      * send command to the ahk debug proxy.
      * @param command
      */
-    public sendComand(command: string, data?: string): Promise<DbgpResponse> {
+    public sendCommand(command: string, data?: string): Promise<DbgpResponse> {
         if (this.commandHandler) {
-            return this.commandHandler.sendComand(command, data);
+            return this.commandHandler.sendCommand(command, data);
         }
         return null;
     }
 
     public async restart() {
-        this.sendComand('stop');
+        this.sendCommand('stop');
         this.debugServer.prepareNewConnection();
         this.start(this.startArgs);
     }
@@ -148,7 +148,7 @@ export class DebugDispather extends EventEmitter {
      * receive stop request from vscode, send command to notice the script stop.
      */
     public stop() {
-        this.sendComand('stop');
+        this.sendCommand('stop');
         this.debugServer.shutdown();
         this.emit('output', `The debugger has stopped.`);
     }
@@ -199,7 +199,7 @@ export class DebugDispather extends EventEmitter {
             return this.getVariable(frameId, scope, propertyName);
         }
 
-        const response = await this.sendComand(
+        const response = await this.sendCommand(
             `context_get -d ${frameId} -c ${scope}`,
         );
 
@@ -229,7 +229,7 @@ export class DebugDispather extends EventEmitter {
         scope: VarScope,
         variableName: string,
     ): Promise<Variable[]> {
-        const response = await this.sendComand(
+        const response = await this.sendCommand(
             `property_get -d ${frameId} -c ${scope} -n ${variableName}`,
         );
         return this.variableHandler.parsePropertyget(response, scope);
@@ -271,7 +271,7 @@ export class DebugDispather extends EventEmitter {
                             : `${parentFullName}.${fullname}`;
                 }
 
-                const response: DbgpResponse = await this.sendComand(
+                const response: DbgpResponse = await this.sendCommand(
                     `property_set -d ${frameId} -c ${scope} -n ${fullname} -t ${type}`,
                     value,
                 );
@@ -300,13 +300,13 @@ export class DebugDispather extends EventEmitter {
     public async stack(
         args: DebugProtocol.StackTraceArguments,
     ): Promise<StackFrame[]> {
-        const response = await this.sendComand(`stack_get`);
+        const response = await this.sendCommand(`stack_get`);
         return this.stackHandler.handle(args, response);
     }
 
     private async setBreakPonit(bp: DebugProtocol.Breakpoint) {
         if (this.debugServer && bp.verified) {
-            const res = await this.sendComand(
+            const res = await this.sendCommand(
                 `breakpoint_set -t line -f ${bp.source.path} -n ${bp.line}`,
             );
             bp.id = res.attr.id;
@@ -335,7 +335,7 @@ export class DebugDispather extends EventEmitter {
         let bps: DebugProtocol.Breakpoint[];
         if (this.debugServer && (bps = this.breakPointHandler.get(path))) {
             for (const bp of bps) {
-                this.sendComand(`breakpoint_remove -d ${bp.id}`);
+                this.sendCommand(`breakpoint_remove -d ${bp.id}`);
             }
         }
     }

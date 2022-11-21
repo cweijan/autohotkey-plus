@@ -15,7 +15,7 @@ export class DebugServer extends EventEmitter {
     }
 
     public start(): DebugServer {
-        const END = 0;
+        const end = 0;
         let tempData: Buffer;
         this.proxyServer = new Net.Server()
             .listen(this.port)
@@ -25,7 +25,7 @@ export class DebugServer extends EventEmitter {
                     tempData = tempData
                         ? Buffer.concat([tempData, chunk])
                         : chunk;
-                    if (tempData[tempData.length - 1] === END) {
+                    if (tempData[tempData.length - 1] === end) {
                         this.process(tempData.toString());
                         tempData = null;
                     }

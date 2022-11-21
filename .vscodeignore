@@ -1,3 +1,4 @@
+# Files to be excluded from the built package
 .vscode/**
 out/test/**
 out/**/*.map
@@ -7,6 +8,6 @@ images/**
 node_modules/
 .gitignore
 tsconfig.json
-.eslintrc.js
+.eslintrc
 build.js
 .github/

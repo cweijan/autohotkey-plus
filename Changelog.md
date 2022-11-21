@@ -103,6 +103,8 @@ Minor bugfixes for syntax highlighting.
 -   Added many more unit tests
 -   Added grammar tests
 -   Add documentation
+-   Add and fixup contribution templates
+-   Fixup GitHub Actions workflows
 
 ## 2.7.1 - 2022-09-16
 
