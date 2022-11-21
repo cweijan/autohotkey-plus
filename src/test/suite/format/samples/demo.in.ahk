@@ -11,8 +11,6 @@ str := "string"
 if (str == "str") {
 MsgBox Overwrite primitive variable!
 }
-; Known bug: `line <n>` lines should be indented one level more
-; https://github.com/mark-wiemer/vscode-autohotkey-plus-plus/issues/25
 str_multiline := "
 (LTrim
 line 1
@@ -62,47 +60,22 @@ method() {
 /* ;region
 Collapse me!
 {
-Collapse me too!
+    Collapse me too!
 }
 */ ;endregion
-
-; Hotkeys and Keywords
-
-<#Tab:: AltTab
-
-; FUNCTIONS
-
-; Method header comment accessible to IntelliSense
-LAlt() {
-; do a thing
-}
 
 ; Function calls (with a space before parens)
 foo()
 bar ()
-baz ()
-
-; Functions with keyword names
-LAlt()
-Pause()
-AppsKey()
-CapsLock()
+baz  () ; multiple spaces
 
 ; SUBROUTINES
 
 ; ExitApp indentation for subroutines
 MySub:
 foo()
-ExitApp
-
-; RUN SELECTION
-
-; Select the following line and hit `Ctrl + F8` to run selection
-f1:: MsgBox, You hit F1
-
-; The F2 hotkey will not work because it was not part of the selection
-f2:: MsgBox, You hit F2
+    ExitApp ; should not be indented at all
 
 ; Formatting line below ternary with third operand a string value
 true ? 1 : "string"
-foo()
+    foo() ; should not be indented at all
