@@ -18,8 +18,8 @@ import { Out } from '../common/out';
 import { Global, ConfigKey } from '../common/global';
 
 /**
- * A Ahk runtime debugger.
- * refrence: https://xdebug.org/docs/dbgp
+ * An AHK runtime debugger.
+ * reference: https://xdebug.org/docs/dbgp
  */
 export class DebugDispatcher extends EventEmitter {
     private port: number;
