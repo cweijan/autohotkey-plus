@@ -238,7 +238,7 @@ export const internalFormat = (
 
         // Stop directives for formatter
         if (emptyLine) {
-            if (comment.match(/;\s*@AHK\+\+AlignAssignmentOff/i)) {
+            if (comment.match(/;\s*@AHK\+AlignAssignmentOff/i)) {
                 alignAssignment = false;
                 assignmentBlock = alignTextAssignOperator(assignmentBlock);
                 // Save aligned block
@@ -253,7 +253,7 @@ export const internalFormat = (
                     );
                 });
                 assignmentBlock = [];
-            } else if (comment.match(/;\s*@AHK\+\+FormatBlockCommentOff/i)) {
+            } else if (comment.match(/;\s*@AHK\+FormatBlockCommentOff/i)) {
                 formatBlockComment = false;
             }
         }
@@ -534,9 +534,9 @@ export const internalFormat = (
 
         // Start directives for formatter
         if (emptyLine) {
-            if (comment.match(/;\s*@AHK\+\+AlignAssignmentOn/i)) {
+            if (comment.match(/;\s*@AHK\+AlignAssignmentOn/i)) {
                 alignAssignment = true;
-            } else if (comment.match(/;\s*@AHK\+\+FormatBlockCommentOn/i)) {
+            } else if (comment.match(/;\s*@AHK\+FormatBlockCommentOn/i)) {
                 formatBlockComment = true;
             }
         }
