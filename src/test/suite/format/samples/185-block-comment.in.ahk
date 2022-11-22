@@ -1,6 +1,6 @@
 ; [Issue #185](https://github.com/mark-wiemer/vscode-autohotkey-plus-plus/issues/185)
 foo () {
-;@AHK++FormatBlockCommentOn
+;@AHK+FormatBlockCommentOn
 /*
 typedef struct TEST {
 DWORD cbSize ; 0
@@ -37,7 +37,7 @@ var =
 Text must be indented with preserved    extra    spaces between words.
 )
 */
-;@AHK++FormatBlockCommentOff
+;@AHK+FormatBlockCommentOff
 MsgBox
 /*
     All text in this block comment must save original indent

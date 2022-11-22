@@ -104,8 +104,8 @@ export const internalFormat = (
     /**
      * Formatter's directive:
      * ```ahk
-     * ;@AHK++AlignAssignmentOn
-     * ;@AHK++AlignAssignmentOff
+     * ;@AHK+AlignAssignmentOn
+     * ;@AHK+AlignAssignmentOff
      * ```
      * Align assignment between this directives
      */
@@ -115,8 +115,8 @@ export const internalFormat = (
     /**
      * Formatter's directive:
      * ```ahk
-     * ;@AHK++FormatBlockCommentOn
-     * ;@AHK++FormatBlockCommentOff
+     * ;@AHK+FormatBlockCommentOn
+     * ;@AHK+FormatBlockCommentOff
      * ```
      * Format text inside block comment like regular code
      */
@@ -265,7 +265,7 @@ export const internalFormat = (
                 // skip to the next iteration
                 return;
             }
-            // Save aligned block if we reach end of text, but didn't find stop directive ';@AHK++AlignAssignmentOff'
+            // Save aligned block if we reach end of text, but didn't find stop directive ';@AHK+AlignAssignmentOff'
             assignmentBlock.forEach((alignedFormattedLine, index) => {
                 formattedString += buildIndentedLine(
                     // return 'lineIndex' before 'assignmentBlock' and increment with 'index'

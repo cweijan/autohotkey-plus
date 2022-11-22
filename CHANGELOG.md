@@ -17,33 +17,33 @@ Formatter directives:
 -   `AlignAssignment` aligns blocks of assignments:
 
     ```ahk
-    ;@AHK++AlignAssignmentOn
+    ;@AHK+AlignAssignmentOn
     a=5
     str = legacy text = with equal symbol
     inputFile:="movie.mkv"
     ; more variables below!
     abc := "abc"
     abc := a + b
-    ;@AHK++AlignAssignmentOff
+    ;@AHK+AlignAssignmentOff
     ```
 
     becomes
 
     ```ahk
-    ;@AHK++AlignAssignmentOn
+    ;@AHK+AlignAssignmentOn
     a          = 5
     str        = legacy text = with equal symbol
     inputFile := "movie.mkv"
     ; more variables below!
     abc       := "abc"
     abc       := a + b
-    ;@AHK++AlignAssignmentOff
+    ;@AHK+AlignAssignmentOff
     ```
 
 -   `FormatBlockComment` tries to format block comments like code:
 
     ```ahk
-    ;@AHK++FormatBlockCommentOn
+    ;@AHK+FormatBlockCommentOn
     /*
     typedef struct TEST {
     DWORD cbSize ; 0
@@ -54,7 +54,7 @@ Formatter directives:
     becomes
 
     ```ahk
-    ;@AHK++FormatBlockCommentOn
+    ;@AHK+FormatBlockCommentOn
     /*
     typedef struct TEST {
         DWORD cbSize ; 0
