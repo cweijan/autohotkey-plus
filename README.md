@@ -132,23 +132,23 @@ Formatter directives instruct the formatter to behave a certain way on sections 
 1. `FormatBlockComment`:
 
     ```autohotkey
-    ;@AHK++FormatBlockCommentOn
+    ;@AHK+FormatBlockCommentOn
     /*
     ;All text inside block comment will be formatted like regular code.
     */
-    ;@AHK++FormatBlockCommentOff
+    ;@AHK+FormatBlockCommentOff
     ```
 
 2. `AlignAssignment`:
 
     ```autohotkey
-    ;@AHK++AlignAssignmentOn
+    ;@AHK+AlignAssignmentOn
     a          = 5 ; number five
     str        = legacy text = with equal symbol
     inputFile := "movie.mkv"
     abc       := "abc" ; string
     abc       := a + b
-    ;@AHK++AlignAssignmentOff
+    ;@AHK+AlignAssignmentOff
     ```
 
 ## Context menu
@@ -158,4 +158,4 @@ Support below function: ![context](image/context.png)
 ## Credits
 
 -   [vscode-autohotkey](https://github.com/stef-levesque/vscode-autohotkey): This project started as a fork of vscode-autohotkey.
--   [autohotkey-plus-plus](https://github.com/mark-wiemer/vscode-autohotkey-plus-plus): AHK++ was a fork of this repo from November 2020. Its changes have been merged into this project.
+-   [AutoHotkey Plus Plus](https://github.com/mark-wiemer/vscode-autohotkey-plus-plus): AHK++ was a fork of this repo from November 2020. Its changes have been merged into this project.
