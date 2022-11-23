@@ -265,10 +265,9 @@ export class DebugDispatcher extends EventEmitter {
                 if (parentFullName) {
                     const isIndex: boolean =
                         fullname.includes('[') && fullname.includes(']');
-                    fullname =
-                        isIndex === true
-                            ? `${parentFullName}${fullname}`
-                            : `${parentFullName}.${fullname}`;
+                    fullname = isIndex
+                        ? `${parentFullName}${fullname}`
+                        : `${parentFullName}.${fullname}`;
                 }
 
                 const response: DbgpResponse = await this.sendCommand(
@@ -276,7 +275,7 @@ export class DebugDispatcher extends EventEmitter {
                     value,
                 );
                 const success = !!parseInt(response.attr.success);
-                if (success === false) {
+                if (!success) {
                     throw new Error(
                         `"${fullname}" cannot be written. Probably read-only.`,
                     );

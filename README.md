@@ -158,4 +158,4 @@ Support below function: ![context](image/context.png)
 ## Credits
 
 -   [vscode-autohotkey](https://github.com/stef-levesque/vscode-autohotkey): This project started as a fork of vscode-autohotkey.
--   [AutoHotkey Plus Plus](https://github.com/mark-wiemer/vscode-autohotkey-plus-plus): AHK++ was a fork of this repo from November 2020. Its changes have been merged into this project.
+-   [AutoHotkey Plus Plus](https://github.com/vscode-autohotkey/vscode-autohotkey-plus-plus): AHK++ was a fork of this repo from November 2020. Its changes have been merged into this project.
