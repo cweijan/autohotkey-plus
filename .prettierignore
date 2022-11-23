@@ -1,3 +1,4 @@
+# Files to be ignored by Prettier code formatter
 # From `.gitignore`
 
 # Folders
@@ -9,3 +10,5 @@ out
 
 # Files
 *.vsix
+# Compiled grammar isn't committed, shouldn't be checked
+language/ahk.tmLanguage.json
