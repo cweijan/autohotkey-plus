@@ -1,7 +1,7 @@
 {
     "name": "vscode-autohotkey-plus",
     "displayName": "AutoHotkey Plus",
-    "version": "2.7.1",
+    "version": "3.0.0",
     "description": "AutoHotkey language support for VS Code",
     "categories": [
         "Programming Languages",

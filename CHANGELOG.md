@@ -1,6 +1,12 @@
 # Changelog
 
-## 3.0.0 - unreleased
+## 3.0.0 - 2022-11-23
+
+This release merges all AHK++ changes through [AHK++ v3.1.0](https://github.com/vscode-autohotkey/vscode-autohotkey-plus-plus/blob/HEAD/Changelog.md#310---2022-11-21-)
+
+**Snippets**: Update snippets for AHK 1.1.35.00 and fix broken `InStr()` snippet ([#263 in AHK++](https://github.com/vscode-autohotkey/vscode-autohotkey-plus-plus/issues/263))
+
+**Grammar**: Fix `#Requires` not being recognized ([#268 in AHK++](https://github.com/vscode-autohotkey/vscode-autohotkey-plus-plus/issues/268))
 
 ### Major formatter changes
 
