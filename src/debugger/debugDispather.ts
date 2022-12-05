@@ -81,9 +81,10 @@ export class DebugDispather extends EventEmitter {
 				this.emit('output', Buffer.from(stream.content, 'base64').toString());
 			})
 			.on("response", (response: DbgpResponse) => {
-				if (response.attr.command) {
-					this.commandHandler.callback(response.attr.transaction_id, response);
-					switch (response.attr.command) {
+				const { command, transaction_id } = response.attr ?? {}
+				if (command) {
+					this.commandHandler.callback(transaction_id, response);
+					switch (command) {
 						case 'run':
 						case 'step_into':
 						case 'step_over':

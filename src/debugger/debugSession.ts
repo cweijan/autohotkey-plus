@@ -1,6 +1,6 @@
-import { commands } from 'vscode';
-import { BreakpointEvent, ExitedEvent, InitializedEvent, LoggingDebugSession, OutputEvent, StoppedEvent, TerminatedEvent, Thread } from '@vscode/debugadapter';
+import { BreakpointEvent, ContinuedEvent, InitializedEvent, LoggingDebugSession, OutputEvent, StoppedEvent, TerminatedEvent, Thread } from '@vscode/debugadapter';
 import { DebugProtocol } from '@vscode/debugprotocol';
+import { commands } from 'vscode';
 import { DebugDispather } from './debugDispather';
 import { Continue } from './struct/command';
 import { VscodeScope } from './struct/scope';
@@ -74,6 +74,7 @@ export class DebugSession extends LoggingDebugSession {
 
 	protected restartRequest(response: DebugProtocol.RestartResponse, args: DebugProtocol.RestartArguments, request?: DebugProtocol.Request): void {
 		this.dispather.restart()
+		this.sendEvent(new ContinuedEvent(DebugSession.THREAD_ID));
 		this.sendResponse(response);
 	}
 
