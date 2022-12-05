@@ -28,10 +28,7 @@
 		"dev": "rimraf out && node build.js",
 		"lint": "eslint src/**/*.ts",
 		"lint:fix": "eslint src/**/*.ts --fix",
-		"packagejson": "sort-package-json --check",
-		"packagejson:fix": "sort-package-json",
 		"publish": "vsce publish",
-		"validate": "npm run packagejson && npm run build",
 		"vscode:prepublish": "npm run build"
 	},
 	"contributes": {
@@ -276,9 +273,6 @@
 		"onCommand:run.ahk",
 		"onDebug"
 	],
-	"lint-staged": {
-		"package.json": "npm run packagejson"
-	},
 	"dependencies": {
 		"@vscode/debugadapter": "^1.57.0",
 		"@vscode/debugprotocol": "^1.58.0",
@@ -288,20 +282,17 @@
 	},
 	"devDependencies": {
 		"@types/node": "^17.0.23",
-		"@types/vscode": "^1.50.0",
+		"@types/vscode": "^1.54.0",
 		"@typescript-eslint/eslint-plugin": "^5.37.0",
 		"@typescript-eslint/parser": "^5.37.0",
 		"esbuild": "^0.15.7",
 		"esbuild-plugin-eslint": "^0.1.1",
 		"eslint": "^8.23.1",
-		"husky": "^8.0.1",
-		"lint-staged": "^13.0.3",
 		"rimraf": "^3.0.2",
-		"sort-package-json": "^1.57.0",
 		"typescript": "^4.6.3"
 	},
 	"engines": {
-		"vscode": "^1.50.0"
+		"vscode": "^1.54.0"
 	},
 	"icon": "icon.png",
 	"galleryBanner": {

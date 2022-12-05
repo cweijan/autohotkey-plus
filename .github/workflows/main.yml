@@ -12,6 +12,6 @@ jobs:
         node-version: 16.x
     - run: npm i
     - run: |
-        echo ">>> Validating AutoHotkey Plus."
-        npm run validate
-        echo ">>> Success: AutoHotkey Plus is valid!"
+        echo ">>> Start compile autohotkey plus."
+        npm run build
+        echo ">>> Compile autohotkey plus sucess!"
