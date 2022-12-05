@@ -281,6 +281,7 @@
 	},
 	"dependencies": {
 		"@vscode/debugadapter": "^1.57.0",
+		"@vscode/debugprotocol": "^1.58.0",
 		"date-format": "^4.0.13",
 		"portfinder": "^1.0.32",
 		"xml2js": "^0.4.23"
