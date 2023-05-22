@@ -1,5 +1,7 @@
 # VSCode-AutoHotkey-Plus
 
+### Note, this extension only supports autohotkey v1.
+
 AutoHotKey language support for VSCode
 - [vscode-autohotkey-Plus](#vscode-autohotkey-plus)
   - [Start](#start)
