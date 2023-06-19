@@ -1,5 +1,7 @@
 # VSCode-AutoHotkey-Plus
 
+This extension is no longer actively maintained, if you are looking for help, please see [mark-wiemer/ahkpp](https://github.com/mark-wiemer/ahkpp).
+
 ### Note, this extension only supports autohotkey v1.
 
 AutoHotKey language support for VSCode
